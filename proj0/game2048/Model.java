@@ -163,9 +163,10 @@ public class Model extends Observable {
 
     /**
      * To solve the columns respectively.
-     * If there are empty places, then move and break the loop.
-     * Else if not empty but can be merged, then merge and marked isMerged.
-     * What's more, add the new tile score to the total score.
+     * First, find the top empty tile towards which there are no other empty ones.
+     * If the not empty one has not been merged, then merge with it and mark that tile as merged.
+     * Otherwise, there are indeed empty one, then move to it.
+     * What's more, after each merge, upgrade the total score.
      */
     private boolean tiltCol(int col) {
         boolean changed = false;
