@@ -144,9 +144,58 @@ public class Model extends Observable {
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
 
+        board.setViewingPerspective(side);
+        for (int i = 0; i < board.size(); i++) {
+            if (tiltCol((i))) {
+                changed = true;
+            }
+        }
+
+        board.setViewingPerspective(Side.NORTH);
+
+
         checkGameOver();
         if (changed) {
             setChanged();
+        }
+        return changed;
+    }
+
+    /**
+     * To solve the columns respectively.
+     * If there are empty places, then move and break the loop.
+     * Else if not empty but can be merged, then merge and marked isMerged.
+     * What's more, add the new tile score to the total score.
+     */
+    private boolean tiltCol(int col) {
+        boolean changed = false;
+        boolean[] isMerged = new boolean[board.size()];
+        //Initialization
+        for (int i = 0; i < board.size(); i++) {
+            isMerged[i] = false;
+        }
+        for (int i = board.size() - 1; i >= 0; i--) {
+            if (i == board.size() - 1) {
+                continue;
+            }
+            if (board.tile(col, i) != null) {
+                Tile t = board.tile(col, i);
+                int j = i + 1;
+                //get the top empty tile
+                while (j < board.size() && board.tile(col, j) == null) {
+                    j++;
+                }
+                j--;
+                if (j + 1 < board.size() && !isMerged[j + 1] && board.tile(col, j + 1).value() == t.value()) {
+                    board.move(col, j + 1, t);
+                    isMerged[i + 1] = true;
+                    score += board.tile(col, j + 1).value();
+                    changed = true;
+                } else if (j > i) {
+                    board.move(col, j, t);
+                    changed = true;
+                }
+            }
         }
         return changed;
     }
@@ -184,7 +233,7 @@ public class Model extends Observable {
     }
 
     /**
-     * Returns true if any tile is equal to the maximum valid value.
+     * Returns true if any  tile is equal to the maximum valid value.
      * Maximum valid value is given by MAX_PIECE. Note that
      * given a Tile object t, we get its value with t.value().
      */
@@ -230,7 +279,7 @@ public class Model extends Observable {
 
 
     @Override
-    /** Returns the model as a string, used for debugging. */
+/** Returns the model as a string, used for debugging. */
     public String toString() {
         Formatter out = new Formatter();
         out.format("%n[%n");
@@ -250,7 +299,7 @@ public class Model extends Observable {
     }
 
     @Override
-    /** Returns whether two models are equal. */
+/** Returns whether two models are equal. */
     public boolean equals(Object o) {
         if (o == null) {
             return false;
@@ -262,7 +311,7 @@ public class Model extends Observable {
     }
 
     @Override
-    /** Returns hash code of Model’s string. */
+/** Returns hash code of Model’s string. */
     public int hashCode() {
         return toString().hashCode();
     }
