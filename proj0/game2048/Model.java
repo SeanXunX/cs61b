@@ -279,8 +279,7 @@ public class Model extends Observable {
 
 
     @Override
-/** Returns the model as a string, used for debugging. */
-    public String toString() {
+/** Returns the model as a string, used for debugging. */ public String toString() {
         Formatter out = new Formatter();
         out.format("%n[%n");
         for (int row = size() - 1; row >= 0; row -= 1) {
@@ -299,8 +298,7 @@ public class Model extends Observable {
     }
 
     @Override
-/** Returns whether two models are equal. */
-    public boolean equals(Object o) {
+/** Returns whether two models are equal. */ public boolean equals(Object o) {
         if (o == null) {
             return false;
         } else if (getClass() != o.getClass()) {
@@ -311,8 +309,7 @@ public class Model extends Observable {
     }
 
     @Override
-/** Returns hash code of Model’s string. */
-    public int hashCode() {
+/** Returns hash code of Model’s string. */ public int hashCode() {
         return toString().hashCode();
     }
 }
