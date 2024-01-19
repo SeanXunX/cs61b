@@ -145,7 +145,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
 
         @Override
         public T next() {
-            return items[pos++];
+            return get(pos++);
         }
     }
 
@@ -157,7 +157,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
         if (!(o instanceof Deque)) {
             return false;
         }
-        ArrayDeque<T> t = (ArrayDeque<T>) o;
+        Deque<T> t = (Deque<T>) o;
         if (t.size() != size) {
             return false;
         }
