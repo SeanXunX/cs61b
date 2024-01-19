@@ -126,7 +126,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
         if (index < 0 || index >= size || isEmpty()) {
             return null;
         }
-        return items[adjustIndex(head + 1 + index)];
+        return items[adjustIndex(head + index + 1)];
     }
 
     @Override
@@ -160,7 +160,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
             return false;
         }
         for (int i = 0; i < size; i++) {
-            if (t.get(i) != items[i]) {
+            if (t.get(i).equals(items[i])) {
                 return false;
             }
         }
