@@ -1,6 +1,10 @@
 package deque;
 
-public class LinkedListDeque<ElemType> implements Listproj1<ElemType>{
+import afu.org.checkerframework.checker.oigj.qual.O;
+
+import java.util.Iterator;
+
+public class LinkedListDeque<ElemType> implements Iterable<ElemType>, Deque<ElemType> {
 
     /**
      * Node of linked list deque
@@ -52,11 +56,6 @@ public class LinkedListDeque<ElemType> implements Listproj1<ElemType>{
         sentinel.prev.next = newNode;
         sentinel.prev = newNode;
         size++;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return size == 0;
     }
 
     @Override
@@ -125,4 +124,44 @@ public class LinkedListDeque<ElemType> implements Listproj1<ElemType>{
         return getRecursive(index, sentinel.next);
     }
 
+    @Override
+    public Iterator<ElemType> iterator() {
+        return new LinkedListDequeIterator();
+    }
+
+    private class LinkedListDequeIterator implements Iterator<ElemType> {
+        LNode t = sentinel;
+
+        @Override
+        public boolean hasNext() {
+            return t.next == sentinel;
+        }
+
+        @Override
+        public ElemType next() {
+            ElemType res = t.next.item;
+            t = t.next;
+            return res;
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof LinkedListDeque)) {
+            return false;
+        }
+        LinkedListDeque<ElemType> t = (LinkedListDeque<ElemType>) o;
+        if (t.size() != size) {
+            return false;
+        }
+        LNode otherNode = t.sentinel, myNode = sentinel;
+        while (myNode.next != sentinel) {
+            if (otherNode.next.item != myNode.next.item) {
+                return false;
+            }
+            otherNode = otherNode.next;
+            myNode = myNode.next;
+        }
+        return true;
+    }
 }

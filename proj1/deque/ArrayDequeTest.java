@@ -1,6 +1,10 @@
 package deque;
 
 import org.junit.Test;
+
+import java.lang.annotation.ElementType;
+import java.util.Iterator;
+
 import static org.junit.Assert.*;
 
 
@@ -119,6 +123,63 @@ public class ArrayDequeTest {
         for (double i = 999999; i > 500000; i--) {
             assertEquals("Should have the same value", i, (double) lld1.removeLast(), 0.0);
         }
+    }
 
+    @Test
+    public void increaseTest() {
+        ArrayDeque<Integer> ad = new ArrayDeque<>();
+        for (int i = 0; i < 16; i++) {
+            ad.addFirst(i);
+        }
+        assertEquals(16, ad.size());
+    }
+
+    @Test
+    public void decreaseTest() {
+        ArrayDeque<Integer> ad = new ArrayDeque<>();
+        for (int i = 0; i < 64; i++) {
+            ad.addFirst(i);
+        }
+        for (int i = 0; i < 64; i++) {
+            ad.removeFirst();
+        }
+    }
+
+    @Test
+    public void IterationTest() {
+        ArrayDeque<String> d1 = new ArrayDeque<>();
+        d1.addLast("I");
+        d1.addLast("hate");
+        d1.addLast("you");
+        d1.addLast("I");
+        d1.addLast("love");
+        d1.addLast("you");
+
+        int i = 0;
+        Iterator<String> d1Iterator = d1.iterator();
+        while(d1Iterator.hasNext()) {
+            assertEquals(d1.get(i++), d1Iterator.next());
+        }
+    }
+
+    @Test
+    public void EqualsTest() {
+        ArrayDeque<String> d1 = new ArrayDeque<>();
+        d1.addLast("I");
+        d1.addLast("hate");
+        d1.addLast("you");
+        d1.addLast("I");
+        d1.addLast("love");
+        d1.addLast("you");
+
+        ArrayDeque<String> d2 = new ArrayDeque<>();
+        d2.addLast("I");
+        d2.addLast("hate");
+        d2.addLast("you");
+        d2.addLast("I");
+        d2.addLast("love");
+        d2.addLast("you");
+
+        assertTrue(d1.get(1).equals(d2.get(1)));
     }
 }

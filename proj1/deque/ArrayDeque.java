@@ -1,6 +1,8 @@
 package deque;
 
-public class ArrayDeque<ElemType> implements Listproj1<ElemType>{
+import java.util.Iterator;
+
+public class ArrayDeque<ElemType> implements Iterable<ElemType>, Deque<ElemType> {
 
     private ElemType[] items;
     //head and tail points to the next position where new item will be placed.
@@ -45,10 +47,6 @@ public class ArrayDeque<ElemType> implements Listproj1<ElemType>{
         tail = adjustIndex(tail);
     }
 
-    @Override
-    public boolean isEmpty() {
-        return size == 0;
-    }
 
     public void resize(int capacity) {
         ElemType[] newArr = (ElemType[]) new Object[capacity];
@@ -97,7 +95,7 @@ public class ArrayDeque<ElemType> implements Listproj1<ElemType>{
         if (isEmpty()) {
             return null;
         }
-        if (items.length >= 16 && size - 1 < (double)(items.length / 4)) {
+        if (items.length >= 16 && size - 1 < (double) (items.length / 4)) {
             resize(items.length / 4);
         }
         head++;
@@ -113,7 +111,7 @@ public class ArrayDeque<ElemType> implements Listproj1<ElemType>{
         if (isEmpty()) {
             return null;
         }
-        if (items.length >= 16 && size - 1 < (double)(items.length / 4)) {
+        if (items.length >= 16 && size - 1 < (double) (items.length / 4)) {
             resize(items.length / 4);
         }
         tail--;
@@ -123,13 +121,47 @@ public class ArrayDeque<ElemType> implements Listproj1<ElemType>{
         size--;
         return res;
     }
-
     @Override
     public ElemType get(int index) {
         if (index < 0 || index >= size || isEmpty()) {
             return null;
         }
         return items[adjustIndex(head + 1 + index)];
+    }
+
+    @Override
+    public Iterator<ElemType> iterator() {
+        return new ArrayDequeIterator();
+    }
+
+    private class ArrayDequeIterator implements Iterator<ElemType> {
+        int pos;
+        @Override
+        public boolean hasNext() {
+            return pos < size;
+        }
+
+        @Override
+        public ElemType next() {
+            return items[pos++];
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ArrayDeque)) {
+            return false;
+        }
+        ArrayDeque<ElemType> t = (ArrayDeque<ElemType>) o;
+        if (t.size() != size) {
+            return false;
+        }
+        for (int i = 0; i < size; i++) {
+            if (t.get(i) != items[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
