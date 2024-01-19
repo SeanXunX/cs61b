@@ -150,7 +150,7 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
         }
         LNode otherNode = t.sentinel, myNode = sentinel;
         while (myNode.next != sentinel) {
-            if (otherNode.next.item.equals(myNode.next.item)) {
+            if (!otherNode.next.item.equals(myNode.next.item)) {
                 return false;
             }
             otherNode = otherNode.next;

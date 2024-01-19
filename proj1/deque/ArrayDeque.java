@@ -100,6 +100,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
         }
         head++;
         head = adjustIndex(head);
+        tail = adjustIndex(tail);
         T res = items[head];
         items[head] = null;
         size--;
@@ -116,6 +117,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
         }
         tail--;
         tail = adjustIndex(tail);
+        head = adjustIndex(head);
         T res = items[tail];
         items[tail] = null;
         size--;
@@ -160,7 +162,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
             return false;
         }
         for (int i = 0; i < size; i++) {
-            if (t.get(i).equals(items[i])) {
+            if (!t.get(i).equals(items[i])) {
                 return false;
             }
         }

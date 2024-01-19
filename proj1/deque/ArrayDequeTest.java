@@ -8,7 +8,9 @@ import java.util.Iterator;
 import static org.junit.Assert.*;
 
 
-/** Performs some basic linked list tests. */
+/**
+ * Performs some basic linked list tests.
+ */
 public class ArrayDequeTest {
 
     @Test
@@ -81,8 +83,8 @@ public class ArrayDequeTest {
     /* Check if you can create ArrayDeques with different parameterized types*/
     public void multipleParamTest() {
 
-        ArrayDeque<String>  lld1 = new ArrayDeque<String>();
-        ArrayDeque<Double>  lld2 = new ArrayDeque<Double>();
+        ArrayDeque<String> lld1 = new ArrayDeque<String>();
+        ArrayDeque<Double> lld2 = new ArrayDeque<Double>();
         ArrayDeque<Boolean> lld3 = new ArrayDeque<Boolean>();
 
         lld1.addFirst("string");
@@ -157,29 +159,36 @@ public class ArrayDequeTest {
 
         int i = 0;
         Iterator<String> d1Iterator = d1.iterator();
-        while(d1Iterator.hasNext()) {
+        while (d1Iterator.hasNext()) {
             assertEquals(d1.get(i++), d1Iterator.next());
         }
     }
 
     @Test
     public void EqualsTest() {
-        ArrayDeque<String> d1 = new ArrayDeque<>();
-        d1.addLast("I");
-        d1.addLast("hate");
-        d1.addLast("you");
-        d1.addLast("I");
-        d1.addLast("love");
-        d1.addLast("you");
-
-        ArrayDeque<String> d2 = new ArrayDeque<>();
-        d2.addLast("I");
-        d2.addLast("hate");
-        d2.addLast("you");
-        d2.addLast("I");
-        d2.addLast("love");
-        d2.addLast("you");
-
-        assertTrue(d1.get(1).equals(d2.get(1)));
+        ArrayDeque<Integer> d1 = new ArrayDeque<>();
+        d1.addLast(0);
+        d1.addFirst(1);
+        d1.addFirst(2);
+        d1.removeLast();
+        d1.addLast(4);
+        d1.addFirst(5);
+        d1.addLast(6);
+        d1.addLast(7);
+        d1.removeFirst();
+        d1.addFirst(9);
+        d1.addLast(10);
+        d1.addFirst(11);
+        d1.removeLast();
+        d1.addLast(13);
+        d1.removeFirst();
+        d1.removeFirst();
+        d1.removeLast();
+        d1.removeFirst();
+        d1.removeFirst();
+        d1.addFirst(19);
+        d1.addFirst(20);
+        d1.get(3);
+        d1.removeLast();
     }
 }
