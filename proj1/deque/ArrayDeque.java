@@ -2,9 +2,9 @@ package deque;
 
 import java.util.Iterator;
 
-public class ArrayDeque<ElemType> implements Iterable<ElemType>, Deque<ElemType> {
+public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
 
-    private ElemType[] items;
+    private T[] items;
     //head and tail points to the next position where new item will be placed.
     private int head;
     private int tail;
@@ -12,7 +12,7 @@ public class ArrayDeque<ElemType> implements Iterable<ElemType>, Deque<ElemType>
 
     //Create an array deque with the starting size of 8.
     public ArrayDeque() {
-        items = (ElemType[]) new Object[8];
+        items = (T[]) new Object[8];
         size = 0;
         head = items.length - 1;
         tail = 0;
@@ -28,7 +28,7 @@ public class ArrayDeque<ElemType> implements Iterable<ElemType>, Deque<ElemType>
     }
 
     @Override
-    public void addFirst(ElemType item) {
+    public void addFirst(T item) {
         if (head == tail) {
             resize(items.length * 2);
         }
@@ -38,7 +38,7 @@ public class ArrayDeque<ElemType> implements Iterable<ElemType>, Deque<ElemType>
     }
 
     @Override
-    public void addLast(ElemType item) {
+    public void addLast(T item) {
         if (head == tail) {
             resize(items.length * 2);
         }
@@ -49,7 +49,7 @@ public class ArrayDeque<ElemType> implements Iterable<ElemType>, Deque<ElemType>
 
 
     public void resize(int capacity) {
-        ElemType[] newArr = (ElemType[]) new Object[capacity];
+        T[] newArr = (T[]) new Object[capacity];
         int pos = 0;
         if (head >= tail) {
             for (int i = head + 1; i < items.length; i++, pos++) {
@@ -91,7 +91,7 @@ public class ArrayDeque<ElemType> implements Iterable<ElemType>, Deque<ElemType>
     }
 
     @Override
-    public ElemType removeFirst() {
+    public T removeFirst() {
         if (isEmpty()) {
             return null;
         }
@@ -100,14 +100,14 @@ public class ArrayDeque<ElemType> implements Iterable<ElemType>, Deque<ElemType>
         }
         head++;
         head = adjustIndex(head);
-        ElemType res = items[head];
+        T res = items[head];
         items[head] = null;
         size--;
         return res;
     }
 
     @Override
-    public ElemType removeLast() {
+    public T removeLast() {
         if (isEmpty()) {
             return null;
         }
@@ -116,13 +116,13 @@ public class ArrayDeque<ElemType> implements Iterable<ElemType>, Deque<ElemType>
         }
         tail--;
         tail = adjustIndex(tail);
-        ElemType res = items[tail];
+        T res = items[tail];
         items[tail] = null;
         size--;
         return res;
     }
     @Override
-    public ElemType get(int index) {
+    public T get(int index) {
         if (index < 0 || index >= size || isEmpty()) {
             return null;
         }
@@ -130,11 +130,11 @@ public class ArrayDeque<ElemType> implements Iterable<ElemType>, Deque<ElemType>
     }
 
     @Override
-    public Iterator<ElemType> iterator() {
+    public Iterator<T> iterator() {
         return new ArrayDequeIterator();
     }
 
-    private class ArrayDequeIterator implements Iterator<ElemType> {
+    private class ArrayDequeIterator implements Iterator<T> {
         int pos;
         @Override
         public boolean hasNext() {
@@ -142,7 +142,7 @@ public class ArrayDeque<ElemType> implements Iterable<ElemType>, Deque<ElemType>
         }
 
         @Override
-        public ElemType next() {
+        public T next() {
             return items[pos++];
         }
     }
@@ -152,7 +152,7 @@ public class ArrayDeque<ElemType> implements Iterable<ElemType>, Deque<ElemType>
         if (!(o instanceof ArrayDeque)) {
             return false;
         }
-        ArrayDeque<ElemType> t = (ArrayDeque<ElemType>) o;
+        ArrayDeque<T> t = (ArrayDeque<T>) o;
         if (t.size() != size) {
             return false;
         }

@@ -1,20 +1,19 @@
 package deque;
 
-import afu.org.checkerframework.checker.oigj.qual.O;
 
 import java.util.Iterator;
 
-public class LinkedListDeque<ElemType> implements Iterable<ElemType>, Deque<ElemType> {
+public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
 
     /**
      * Node of linked list deque
      */
     private class LNode {
-        ElemType item;
+        T item;
         LNode prev;
         LNode next;
 
-        public LNode(ElemType item, LNode prev, LNode next) {
+        public LNode(T item, LNode prev, LNode next) {
             this.item = item;
             this.prev = prev;
             this.next = next;
@@ -34,7 +33,7 @@ public class LinkedListDeque<ElemType> implements Iterable<ElemType>, Deque<Elem
         sentinel.prev = sentinel;
     }
 
-    public LinkedListDeque(ElemType x) {
+    public LinkedListDeque(T x) {
         size = 1;
         sentinel = new LNode(null, null, null);
         LNode newNode = new LNode(x, sentinel, sentinel);
@@ -43,7 +42,7 @@ public class LinkedListDeque<ElemType> implements Iterable<ElemType>, Deque<Elem
     }
 
     @Override
-    public void addFirst(ElemType item) {
+    public void addFirst(T item) {
         LNode newNode = new LNode(item, sentinel, sentinel.next);
         sentinel.next.prev = newNode;
         sentinel.next = newNode;
@@ -51,7 +50,7 @@ public class LinkedListDeque<ElemType> implements Iterable<ElemType>, Deque<Elem
     }
 
     @Override
-    public void addLast(ElemType item) {
+    public void addLast(T item) {
         LNode newNode = new LNode(item, sentinel.prev, sentinel);
         sentinel.prev.next = newNode;
         sentinel.prev = newNode;
@@ -74,11 +73,11 @@ public class LinkedListDeque<ElemType> implements Iterable<ElemType>, Deque<Elem
     }
 
     @Override
-    public ElemType removeFirst() {
+    public T removeFirst() {
         if (isEmpty()) {
             return null;
         }
-        ElemType res = sentinel.next.item;
+        T res = sentinel.next.item;
         sentinel.next.next.prev = sentinel;
         sentinel.next = sentinel.next.next;
         size--;
@@ -86,11 +85,11 @@ public class LinkedListDeque<ElemType> implements Iterable<ElemType>, Deque<Elem
     }
 
     @Override
-    public ElemType removeLast() {
+    public T removeLast() {
         if (isEmpty()) {
             return null;
         }
-        ElemType res = sentinel.prev.item;
+        T res = sentinel.prev.item;
         sentinel.prev.prev.next = sentinel;
         sentinel.prev = sentinel.prev.prev;
         size--;
@@ -98,7 +97,7 @@ public class LinkedListDeque<ElemType> implements Iterable<ElemType>, Deque<Elem
     }
 
     @Override
-    public ElemType get(int index) {
+    public T get(int index) {
         if (index < 0 || index > size - 1 || isEmpty()) {
             return null;
         }
@@ -110,14 +109,14 @@ public class LinkedListDeque<ElemType> implements Iterable<ElemType>, Deque<Elem
         return temp.item;
     }
 
-    private ElemType getRecursive(int index, LNode t) {
+    private T getRecursive(int index, LNode t) {
         if (index == 0) {
             return t.item;
         }
         return getRecursive(index - 1, t.next);
     }
 
-    public ElemType getRecursive(int index) {
+    public T getRecursive(int index) {
         if (index < 0 || index > size - 1 || isEmpty()) {
             return null;
         }
@@ -125,11 +124,11 @@ public class LinkedListDeque<ElemType> implements Iterable<ElemType>, Deque<Elem
     }
 
     @Override
-    public Iterator<ElemType> iterator() {
+    public Iterator<T> iterator() {
         return new LinkedListDequeIterator();
     }
 
-    private class LinkedListDequeIterator implements Iterator<ElemType> {
+    private class LinkedListDequeIterator implements Iterator<T> {
         LNode t = sentinel;
 
         @Override
@@ -138,8 +137,8 @@ public class LinkedListDeque<ElemType> implements Iterable<ElemType>, Deque<Elem
         }
 
         @Override
-        public ElemType next() {
-            ElemType res = t.next.item;
+        public T next() {
+            T res = t.next.item;
             t = t.next;
             return res;
         }
@@ -150,7 +149,7 @@ public class LinkedListDeque<ElemType> implements Iterable<ElemType>, Deque<Elem
         if (!(o instanceof LinkedListDeque)) {
             return false;
         }
-        LinkedListDeque<ElemType> t = (LinkedListDeque<ElemType>) o;
+        LinkedListDeque<T> t = (LinkedListDeque<T>) o;
         if (t.size() != size) {
             return false;
         }

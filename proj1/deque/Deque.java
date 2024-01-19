@@ -2,35 +2,35 @@ package deque;
 
 import java.util.Iterator;
 
-public interface Deque<ElemType> {
-    public void addFirst(ElemType item);
+public interface Deque<T> {
+    void addFirst(T item);
 
 
-    public void addLast(ElemType item);
+    void addLast(T item);
 
 
-    default public boolean isEmpty() {
+    default boolean isEmpty() {
         return size() == 0;
     }
 
 
-    public int size();
+    int size();
 
 
-    public void printDeque();
+    void printDeque();
 
 
-    public ElemType removeFirst();
+    T removeFirst();
 
 
-    public ElemType removeLast();
+    T removeLast();
 
 
-    public ElemType get(int index);
+    T get(int index);
 
 
-    public Iterator<ElemType> iterator();
+    Iterator<T> iterator();
 
 
-    public boolean equals(Object o);
+    boolean equals(Object o);
 }
