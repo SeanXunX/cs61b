@@ -136,8 +136,28 @@ public class LinkedListDequeTest {
         d1.addLast("you");
 
         int i = 0;
-        for (String s : d1) {
-            assertEquals(d1.get(i++), s);
+        Iterator<String> d1Iterator = d1.iterator();
+        while(d1Iterator.hasNext()) {
+            assertEquals(d1.get(i++), d1Iterator.next());
         }
+    }
+
+    @Test
+    public void IndexTest() {
+        LinkedListDeque<String> d1 = new LinkedListDeque<>();
+        d1.addLast("I");
+        d1.addLast("hate");
+        d1.addLast("you");
+        d1.addLast("I");
+        d1.addLast("love");
+        d1.addLast("you");
+
+        int i = 0;
+        Iterator<String> d1Iterator = d1.iterator();
+        while(d1Iterator.hasNext()) {
+            assertEquals(d1.get(i++), d1Iterator.next());
+        }
+
+        assertNull(d1.get(6));
     }
 }

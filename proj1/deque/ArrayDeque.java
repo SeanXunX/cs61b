@@ -48,7 +48,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
     }
 
 
-    public void resize(int capacity) {
+    private void resize(int capacity) {
         T[] newArr = (T[]) new Object[capacity];
         int pos = 0;
         if (head >= tail) {
@@ -149,7 +149,10 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof ArrayDeque)) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof Deque)) {
             return false;
         }
         ArrayDeque<T> t = (ArrayDeque<T>) o;

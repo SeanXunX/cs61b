@@ -13,7 +13,7 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
         LNode prev;
         LNode next;
 
-        public LNode(T item, LNode prev, LNode next) {
+        LNode(T item, LNode prev, LNode next) {
             this.item = item;
             this.prev = prev;
             this.next = next;
@@ -31,14 +31,6 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
         sentinel = new LNode(null, null, null);
         sentinel.next = sentinel;
         sentinel.prev = sentinel;
-    }
-
-    public LinkedListDeque(T x) {
-        size = 1;
-        sentinel = new LNode(null, null, null);
-        LNode newNode = new LNode(x, sentinel, sentinel);
-        sentinel.next = newNode;
-        sentinel.prev = newNode;
     }
 
     @Override
@@ -133,7 +125,7 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
 
         @Override
         public boolean hasNext() {
-            return t.next == sentinel;
+            return t.next != sentinel;
         }
 
         @Override
@@ -146,7 +138,10 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof LinkedListDeque)) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof Deque)) {
             return false;
         }
         LinkedListDeque<T> t = (LinkedListDeque<T>) o;
