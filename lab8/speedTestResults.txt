@@ -1,0 +1,52 @@
+This program inserts random Strings of length L
+ Into different types of maps as <String, Integer> pairs.
+
+What would you like L to be?: 1000
+
+Enter # strings to insert into hashmap.ULLMap: qianlizhiwai
+Please enter a positive integer: 1000
+class hashmap.ULLMap: 0.02 sec
+
+Enter # strings to insert into your hashmap.MyHashMap: qianlizhiwai
+Please enter a positive integer: 1000
+class hashmap.MyHashMap: 0.04 sec
+
+Enter # strings to insert into Java's HashMap: qianlizhiwai
+Please enter a positive integer: 1000
+Java's Built-in HashMap: 0.02 sec
+
+Would you like to try more timed-tests? (y/n)n
+
+Process finished with exit code 0
+
+This program inserts lexicographically increasing Stringsinto Maps as <String, Integer> pairs.
+
+Enter # strings to insert into hashmap.ULLMap: 12345
+class hashmap.ULLMap: 0.62 sec
+
+Enter # strings to insert into hashmap.MyHashMap: 12345
+class hashmap.MyHashMap: 0.78 sec
+
+Enter # strings to insert into Java's HashMap: 12345
+Java's Built-in HashMap: 0.00 sec
+
+Would you like to try more timed-tests? (y/n): n
+
+Process finished with exit code 0
+
+This program inserts random Strings of length L
+ Into different types of maps as <String, Integer> pairs.
+
+What would you like L to be?: 12345
+
+Enter # strings to insert into each map: aaaa514
+Please enter a positive integer: 12345
+class hashmap.MyHashMapALBuckets: 3.65 sec
+class hashmap.MyHashMapLLBuckets: 4.50 sec
+class hashmap.MyHashMapTSBuckets: 5.20 sec
+class hashmap.MyHashMapHSBuckets: 7.46 sec
+class hashmap.MyHashMapPQBuckets: 4.60 sec
+
+Would you like to try more timed-tests? (y/n)n
+
+Process finished with exit code 0
