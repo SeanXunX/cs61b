@@ -15,7 +15,7 @@ public class Main {
 
     public static final File CWD = new File(System.getProperty("user.dir"));
     public static final File GITLET_DIR = join(CWD, ".gitlet");
-    public static final File stageSerialized = join(GITLET_DIR, "stage", "Serialized");
+    public static final File stageSerialized = join(GITLET_DIR, "Serialized");
 
     public static Serialized serialized;
     /**

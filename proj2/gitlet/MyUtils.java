@@ -29,7 +29,7 @@ public class MyUtils {
      */
     public static void move(File src, File tar) {
         copy(src, tar);
-        restrictedDelete(src);
+        src.delete();
     }
 
     /**

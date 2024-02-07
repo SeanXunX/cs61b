@@ -71,7 +71,7 @@ public class Repository {
     /**
      * Records the id to name mapping of addition and removal.
      */
-    public static final File stageSerialized = join(GITLET_DIR, "stage", "Serialized");
+    public static final File stageSerialized = join(GITLET_DIR, "Serialized");
 
 
     /**
@@ -90,8 +90,7 @@ public class Repository {
      */
     public static final File HEAD = join(GITLET_DIR, "HEAD");
 
-    private static String curBranchName;
-
+    private static String curBranchName = Main.serialized.getCurBranchName();
 
 
     /**
@@ -135,6 +134,7 @@ public class Repository {
         //Create branch master
         File masterPath = join(heads_DIR, "master");
         curBranchName = "master";
+        Main.serialized.setCurBranchName(curBranchName);
         writeContents(masterPath, newCommit.getId());
         //Update HEAD
         writeContentFromFile(masterPath, HEAD);
@@ -241,7 +241,7 @@ public class Repository {
                 rmBlob.toRm();
                 File cwdFile = join(CWD, fileName);
                 if (cwdFile.exists()) {
-                    restrictedDelete(cwdFile);
+                    cwdFile.delete();
                 }
             }
         }
@@ -595,7 +595,7 @@ public class Repository {
         //Clear the files which are tracked by the current Commit in CWD
         for (Map.Entry<String, String> entry : curCommit.getIdToName().entrySet()) {
             File cwdPathCur = join(CWD, entry.getValue());
-            restrictedDelete(cwdPathCur);
+            cwdPathCur.delete();
         }
         //Add the files which are tracked by the target Commit to CWD
         for (Map.Entry<String, String> entry : tarCommit.getIdToName().entrySet()) {
@@ -611,6 +611,7 @@ public class Repository {
 
         //Change the current branch
         curBranchName = branchName;
+        Main.serialized.setCurBranchName(curBranchName);
         writeContents(HEAD, tarCommit.getId());
     }
 
@@ -621,7 +622,7 @@ public class Repository {
         List<String> fileIds = plainFilenamesIn(area);
         if (fileIds != null) {
             for (String id : fileIds) {
-                restrictedDelete(join(area, id));
+                join(area, id).delete();
             }
         }
     }
@@ -669,7 +670,7 @@ public class Repository {
             System.out.println("Cannot remove the current branch.");
             System.exit(0);
         }
-        restrictedDelete(tarBranch);
+        tarBranch.delete();
     }
 
     /**

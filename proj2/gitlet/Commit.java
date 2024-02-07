@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static gitlet.Utils.*;
 import static gitlet.MyUtils.*;
@@ -133,7 +134,7 @@ public class Commit implements Serializable {
     private void rmFromMapping() {
         for (Map.Entry<String, String> entry : Blob.getRmFiles().entrySet()) {
             idToName.remove(entry.getKey());
-            restrictedDelete(join(rm_DIR, entry.getKey()));
+            join(rm_DIR, entry.getKey()).delete();
             Blob.getRmFiles().remove(entry.getKey());
         }
     }
@@ -144,7 +145,7 @@ public class Commit implements Serializable {
      * Generates the id according to message, date, parent, second_parent, idToName
      */
     private String generateId() {
-        return sha1(message, date.toString(), parent, second_parent, idToName.toString());
+        return sha1(message, date.toString(), parent, Objects.requireNonNullElse(second_parent, ""), idToName.toString());
     }
 
     private String generateIdInit() {

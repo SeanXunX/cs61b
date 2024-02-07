@@ -90,7 +90,7 @@ public class Blob implements Serializable {
     public static void rmTarName(String fileName) {
         for (Map.Entry<String, String> entry : addFiles.entrySet()) {
             if (entry.getKey().equals(fileName)) {
-                restrictedDelete(join(add_DIR, entry.getKey()));
+                join(add_DIR, entry.getKey()).delete();
                 addFiles.remove(entry.getKey());
             }
         }
@@ -118,7 +118,7 @@ public class Blob implements Serializable {
     public void removeFromAdd() {
         File addPath = join(add_DIR, id);
         if (existsInAdd()) {
-            restrictedDelete(addPath);
+            addPath.delete();
             addFiles.remove(id);
         }
     }

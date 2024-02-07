@@ -17,9 +17,21 @@ public class Serialized implements Serializable {
      * Id to name.
      */
     private HashMap<String, String> rmFiles;
+
+    /**
+     * Records the curBranchName
+     */
+    private String curBranchName;
+
     public Serialized() {
         addFiles = new HashMap<>();
         rmFiles = new HashMap<>();
+    }
+    public String getCurBranchName() {
+        return curBranchName;
+    }
+    public void setCurBranchName(String curBranchName) {
+        this.curBranchName = curBranchName;
     }
     public HashMap<String, String> getAddFiles() {
         return addFiles;
