@@ -174,8 +174,6 @@ public class Repository {
         }
         Blob newBlob = new Blob(fileName);
         newBlob.toAdd();
-        //TODO: delete
-        System.out.println("Repository: addFiles.size() = " + Blob.getAddFiles().size());
         if (newBlob.existsInCurCommit()) {
             newBlob.removeFromAdd();
         }

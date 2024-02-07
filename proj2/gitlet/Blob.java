@@ -85,8 +85,6 @@ public class Blob implements Serializable {
             writeContents(saveFile, readContentsAsString(filePath));
             addFiles.put(id, fileName);
         }
-        //TODO: delete
-        System.out.println("Blob: addFiles.size() = " + addFiles.size());
     }
 
     public static void rmTarName(String fileName) {
