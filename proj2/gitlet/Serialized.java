@@ -10,13 +10,13 @@ public class Serialized implements Serializable {
      * The files stored in the addition.
      * Id to name.
      */
-    private static HashMap<String, String> addFiles;
+    private HashMap<String, String> addFiles;
 
     /**
      * The files stored in the removal.
      * Id to name.
      */
-    private static HashMap<String, String> rmFiles;
+    private HashMap<String, String> rmFiles;
     public Serialized() {
         addFiles = new HashMap<>();
         rmFiles = new HashMap<>();

@@ -174,7 +174,6 @@ public class Commit implements Serializable {
 
     /**
      * gets the commit to which HEAD points
-     * @return
      */
     public static Commit getHeadCommit() {
         File headCommitPath = join(commits_DIR, readContentsAsString(HEAD));
