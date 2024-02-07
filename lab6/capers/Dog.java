@@ -58,7 +58,6 @@ public class Dog implements Serializable{ // TODO
      * Saves a dog to a file for future use.
      */
     public void saveDog() throws IOException {
-        // TODO (hint: don't forget dog names are unique)
         File dogPath = join(DOG_FOLDER, name);
         dogPath.createNewFile();
         writeObject(dogPath, this);

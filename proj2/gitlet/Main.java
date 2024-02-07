@@ -1,24 +1,116 @@
 package gitlet;
 
-/** Driver class for Gitlet, a subset of the Git version-control system.
- *  @author TODO
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+
+import static gitlet.Utils.*;
+
+/**
+ * Driver class for Gitlet, a subset of the Git version-control system.
+ *
+ * @author TODO
  */
 public class Main {
 
-    /** Usage: java gitlet.Main ARGS, where ARGS contains
-     *  <COMMAND> <OPERAND1> <OPERAND2> ... 
+    public static final File CWD = new File(System.getProperty("user.dir"));
+    public static final File GITLET_DIR = join(CWD, ".gitlet");
+    public static final File stageSerialized = join(GITLET_DIR, "stage", "Serialized");
+
+    public static Serialized serialized;
+    /**
+     * Usage: java gitlet.Main ARGS, where ARGS contains
+     * <COMMAND> <OPERAND1> <OPERAND2> ...
      */
-    public static void main(String[] args) {
-        // TODO: what if args is empty?
+    public static void main(String[] args) throws IOException {
+        if (args.length == 0) {
+            System.out.println("Please enter a command.");
+            System.exit(0);
+        }
+        //Get the serialized
+        if (stageSerialized.exists()) {
+            serialized = readObject(stageSerialized, Serialized.class);
+        } else {
+            serialized = new Serialized();
+        }
+
         String firstArg = args[0];
-        switch(firstArg) {
+        switch (firstArg) {
             case "init":
-                // TODO: handle the `init` command
+                validateNumArgs(args, 1);
+                Repository.init();
                 break;
             case "add":
-                // TODO: handle the `add [filename]` command
+                validateNumArgs(args, 2);
+                Repository.add(args[1]);
                 break;
-            // TODO: FILL THE REST IN
+            case "commit":
+                validateNumArgs(args, 2);
+                Repository.commit(args[1]);
+                break;
+            case "rm":
+                validateNumArgs(args, 2);
+                Repository.rm(args[1]);
+                break;
+            case "log":
+                validateNumArgs(args, 1);
+                Repository.log();
+                break;
+            case "global-log":
+                validateNumArgs(args, 1);
+                Repository.global_log();
+                break;
+            case "find":
+                validateNumArgs(args, 2);
+                Repository.find(args[1]);
+                break;
+            case "status":
+                validateNumArgs(args, 1);
+                Repository.status();
+                break;
+            case "checkout":
+                //args.length 2 3 4
+                switch (args.length) {
+                    case 3:
+                        Repository.checkout_fileName(args[2]);
+                        break;
+                    case 4:
+                        Repository.checkout_idAndFileName(args[1], args[3]);
+                        break;
+                    case 2:
+                        Repository.checkout_branchName(args[1]);
+                        break;
+                    default:
+                        System.out.println("Incorrect operands.");
+                        System.exit(0);
+                        break;
+                }
+                break;
+            case "branch":
+                validateNumArgs(args, 2);
+                Repository.branch(args[1]);
+                break;
+            case "rm-branch":
+                validateNumArgs(args, 2);
+                Repository.rm_branch(args[1]);
+                break;
+            case "reset":
+                validateNumArgs(args, 2);
+                break;
+            case "merge":
+                validateNumArgs(args, 2);
+                break;
+            default:
+                System.out.println("No command with that name exists.");
+                System.exit(0);
+        }
+        writeObject(stageSerialized, serialized);
+    }
+
+    public static void validateNumArgs(String[] args, int n) {
+        if (args.length != n) {
+            System.out.println("Incorrect operands.");
+            System.exit(0);
         }
     }
 }
