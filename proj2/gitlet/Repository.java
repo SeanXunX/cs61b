@@ -407,7 +407,7 @@ public class Repository {
         List<String> stagedFs = new LinkedList<>();
         List<String> removedFs = new LinkedList<>();
         List<String> modNotStagedFs = new LinkedList<>();
-        List<String> untrackedFs = plainFilenamesIn(CWD);
+        List<String> untrackedFs = new ArrayList<>(Objects.requireNonNull(plainFilenamesIn(CWD)));
 
         Commit curCommit = Commit.getHeadCommit();
 
@@ -474,7 +474,7 @@ public class Repository {
         File filePath = join(CWD, fileName);
         if (filePath.exists()) {
             String contents = readContentsAsString(filePath);
-            return sha1("blob", contents, fileName);
+            return sha1(contents, fileName);
         }
         return null;
     }
