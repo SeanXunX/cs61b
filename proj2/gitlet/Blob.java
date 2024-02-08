@@ -28,7 +28,7 @@ public class Blob implements Serializable {
     private final String fileName;
 
     /**
-     * The path of the file this blob saves.
+     * The path of the file this blob saves in stage folder (addition, removal).
      */
     private final File filePath;
 
@@ -101,7 +101,7 @@ public class Blob implements Serializable {
      */
     public void toRm() {
         File saveFile = join(rm_DIR, id);
-        writeContents(saveFile, filePath);
+        writeContents(saveFile, readContentsAsString(filePath));
         rmFiles.put(id, fileName);
     }
 

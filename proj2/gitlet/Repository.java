@@ -275,7 +275,11 @@ public class Repository {
         Commit curCommit = Commit.getHeadCommit();
         while (curCommit != null) {
             printLog(curCommit);
-            curCommit = curCommit.parentCommit();
+            if (curCommit.getParent() == null) {
+                break;
+            } else {
+                curCommit = curCommit.parentCommit();
+            }
         }
     }
 
