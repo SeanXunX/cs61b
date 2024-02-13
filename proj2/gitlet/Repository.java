@@ -605,7 +605,7 @@ public class Repository {
         //Add the files which are tracked by the target Commit to CWD
         for (Map.Entry<String, String> entry : tarCommit.getIdToName().entrySet()) {
             File cwdPathCur = join(CWD, entry.getValue());
-            writeContents(cwdPathCur, join(blobs_DIR, entry.getKey()));
+            writeContentFromFile(join(blobs_DIR, entry.getKey()), cwdPathCur);
         }
 
         //Clear the staging area.
@@ -632,7 +632,7 @@ public class Repository {
         }
     }
     private static List<String> getUntrackedFileNames() {
-        List<String> untrackedFs = plainFilenamesIn(CWD);
+        List<String> untrackedFs = new ArrayList<>(Objects.requireNonNull(plainFilenamesIn(CWD)));
         Commit curCommit = Commit.getHeadCommit();
 
         for (Map.Entry<String, String> entry : curCommit.getIdToName().entrySet()) {
