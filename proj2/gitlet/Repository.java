@@ -536,12 +536,7 @@ public class Repository {
      */
     public static void checkout_idAndFileName(String commitId, String fileName) {
         notInitializedError();
-        File tarCommitPath = join(commits_DIR, commitId);
-        if (!tarCommitPath.exists()) {
-            System.out.println("No commit with that id exists.");
-            System.exit(0);
-        }
-        Commit tarCommit = readObject(tarCommitPath, Commit.class);
+        Commit tarCommit = getTarCommitFromId(commitId);
         String id = tarCommit.NameToIdInMapping(fileName);
         if (id == null) {
             System.out.println("File does not exist in that commit.");
@@ -550,6 +545,41 @@ public class Repository {
         File src = join(blobs_DIR, id);
         File cwdPath = join(CWD, fileName);
         writeContents(cwdPath, readContentsAsString(src));
+    }
+
+    private static String AbbToFull(String abbId) {
+        char[] abbs = abbId.toCharArray();
+        List<String> commitIds = plainFilenamesIn(commits_DIR);
+        for (String fullId : commitIds) {
+            boolean flag = false;
+            char[] temps = fullId.toCharArray();
+            for (int i = 0; i < 6; i++) {
+                flag = (abbs[i] == temps[i]);
+            }
+            if (flag) {
+                return fullId;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * According to the given id, which may be abbreviated, returns the target commit.
+     */
+    private static Commit getTarCommitFromId(String commitId) {
+        if (commitId.length() == 6) {
+            commitId = AbbToFull(commitId);
+        }
+        if (commitId == null) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
+        File tarCommitPath = join(commits_DIR, commitId);
+        if (!tarCommitPath.exists()) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
+        return readObject(tarCommitPath, Commit.class);
     }
     /**
      * Failure cases:
@@ -590,34 +620,63 @@ public class Repository {
             System.exit(0);
         }
         Commit tarCommit = Commit.getHeadCommitOfBranch(branchName);
-        Commit curCommit = Commit.getHeadCommit();
-        List<String> untrackedFNs = getUntrackedFileNames();
-        if (untrackedFNs.isEmpty()) {
-            System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-            System.exit(0);
-        }
 
-        //Clear the files which are tracked by the current Commit in CWD
-        for (Map.Entry<String, String> entry : curCommit.getIdToName().entrySet()) {
-            File cwdPathCur = join(CWD, entry.getValue());
-            cwdPathCur.delete();
-        }
-        //Add the files which are tracked by the target Commit to CWD
+        UntrackedError(tarCommit);
+        ClearCurTrackedCWD();
+        AddTarTrackedCWD(tarCommit);
+
+        ClearStaging();
+        SetCurBranch(branchName);
+        writeContents(HEAD, tarCommit.getId());
+    }
+
+    /**
+     * Add the files which are tracked by the target Commit to CWD
+     */
+    private static void AddTarTrackedCWD(Commit tarCommit) {
         for (Map.Entry<String, String> entry : tarCommit.getIdToName().entrySet()) {
             File cwdPathCur = join(CWD, entry.getValue());
             writeContentFromFile(join(blobs_DIR, entry.getKey()), cwdPathCur);
         }
+    }
 
+    /**
+     * Clear the tracked files in CWD.
+     */
+    private static void ClearCurTrackedCWD() {
+        Commit curCommit = Commit.getHeadCommit();
+        for (Map.Entry<String, String> entry : curCommit.getIdToName().entrySet()) {
+            File cwdPathCur = join(CWD, entry.getValue());
+            cwdPathCur.delete();
+        }
+    }
+
+    /**
+     * If a working file is untracked in the current branch and would be overwritten by the checkout,
+     * print There is an untracked file in the way; delete it, or add and commit it first. and exit;
+     */
+    private static void UntrackedError(Commit tarCommit) {
+        List<String> untrackedFNs = getUntrackedFileNames(); //file name not id
+        for (String name : tarCommit.getIdToName().values()) {
+            if (untrackedFNs.contains(name)) {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                System.exit(0);
+            }
+        }
+    }
+
+    private static void SetCurBranch(String branchName) {
+        //Change the current branch
+        curBranchName = branchName;
+        Main.serialized.setCurBranchName(curBranchName);
+    }
+
+    private static void ClearStaging() {
         //Clear the staging area.
         clearStagingArea(add_DIR);
         Blob.getAddFiles().clear();
         clearStagingArea(rm_DIR);
         Blob.getRmFiles().clear();
-
-        //Change the current branch
-        curBranchName = branchName;
-        Main.serialized.setCurBranchName(curBranchName);
-        writeContents(HEAD, tarCommit.getId());
     }
 
     /**
@@ -679,11 +738,32 @@ public class Repository {
     }
 
     /**
-     *
+     * Checks out all the files tracked by the given commit.
+     * Removes tracked files that are not present in that commit.
+     * <p>
+     * Also moves the current branch’s head to that commit node.
+     * <p>
+     * The [commit id] may be abbreviated as for checkout.
+     * <p>
+     * The staging area is cleared.
+     * <p>
+     * Failure cases:
+     * If no commit with the given id exists,
+     * print No commit with that id exists.
+     * <p>
+     * If a working file is untracked in the current branch and
+     * would be overwritten by the reset,
+     * print `There is an untracked file in the way; delete it, or add and commit it first.`
+     * and exit; perform this check before doing anything else.
      */
     public static void reset(String commitId) {
-
+        notInitializedError();
+        Commit tarCommit = getTarCommitFromId(commitId);
+        UntrackedError(tarCommit);
+        ClearCurTrackedCWD();
+        AddTarTrackedCWD(tarCommit);
+        ClearStaging();
+        writeContents(HEAD, tarCommit.getId());
     }
-
 
 }
