@@ -128,6 +128,11 @@ public class Commit implements Serializable {
         return null;
     }
 
+    public static String NameToIdInMappingCurCom(String fileName) {
+        Commit curCommit = getHeadCommit();
+        return curCommit.NameToIdInMapping(fileName);
+    }
+
     /**
      * Removes the files that are tracked in the removal from the current blob mapping.
      */
@@ -169,8 +174,8 @@ public class Commit implements Serializable {
     /**
      * returns if the blob with the id (blobId) has exits in this commit
      */
-    public boolean hasBlob(Blob blob) {
-        return idToName.containsKey(blob.getId());
+    public boolean hasBlob(String id) {
+        return idToName.containsKey(id);
     }
 
     /**

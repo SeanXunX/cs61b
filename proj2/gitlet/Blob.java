@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static gitlet.Utils.*;
+import static gitlet.MyUtils.*;
 
 public class Blob implements Serializable {
     /**
@@ -20,6 +21,8 @@ public class Blob implements Serializable {
     public static final File GITLET_DIR = join(CWD, ".gitlet");
     public static final File add_DIR = join(GITLET_DIR, "stage", "addition");
     public static final File rm_DIR = join(GITLET_DIR, "stage", "removal");
+    public static final File commits_DIR = join(GITLET_DIR, "objects", "commits");
+    public static final File blobs_DIR = join(GITLET_DIR, "objects", "blobs");
 
 
     /**
@@ -87,7 +90,7 @@ public class Blob implements Serializable {
         }
     }
 
-    public static void rmTarName(String fileName) {
+    private static void rmTarName(String fileName) {
         for (Map.Entry<String, String> entry : addFiles.entrySet()) {
             if (entry.getKey().equals(fileName)) {
                 join(add_DIR, entry.getKey()).delete();
@@ -97,35 +100,45 @@ public class Blob implements Serializable {
     }
 
     /**
-     * Add this blob to the removal.
+     * Adds this blob to the removal.
      */
-    public void toRm() {
-        File saveFile = join(rm_DIR, id);
-        writeContents(saveFile, readContentsAsString(filePath));
+    public static void toRm(String id, String fileName) {
+        File rmPath = join(rm_DIR, id);
+        File filePath = join(blobs_DIR, id);
+        copy(filePath, rmPath);
         rmFiles.put(id, fileName);
     }
 
     /**
      * returns if the blob has already existed in the addition
      */
-    public boolean existsInAdd() {
+    public static boolean existsInAdd(String id) {
         return join(add_DIR, id).exists();
     }
 
     /**
      * Removes the Blob from the addition if exists
      */
-    public void removeFromAdd() {
-        File addPath = join(add_DIR, id);
-        if (existsInAdd()) {
+    public static void removeFromAdd(String id) {
+        if (existsInAdd(id)) {
+            File addPath = join(add_DIR, id);
             addPath.delete();
             addFiles.remove(id);
         }
     }
 
-    public boolean existsInCurCommit() {
+    public static boolean existsInCurCommit(String id) {
         Commit currentCommit = Commit.getHeadCommit();
-        return currentCommit.hasBlob(this);
+        return currentCommit.hasBlob(id);
+    }
+
+    public static String NameToIdInAddition(String fileName) {
+        for (Map.Entry<String, String> entryTracked : addFiles.entrySet()) {
+            if (entryTracked.getValue().equals(fileName)) {
+                return entryTracked.getKey();
+            }
+        }
+        return null;
     }
 
 }

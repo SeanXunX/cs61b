@@ -174,8 +174,8 @@ public class Repository {
         }
         Blob newBlob = new Blob(fileName);
         newBlob.toAdd();
-        if (newBlob.existsInCurCommit()) {
-            newBlob.removeFromAdd();
+        if (Blob.existsInCurCommit(newBlob.getId())) {
+            Blob.removeFromAdd(newBlob.getId());
         }
     }
 
@@ -229,17 +229,18 @@ public class Repository {
      */
     public static void rm(String fileName) {
         notInitializedError();
-        Blob rmBlob = new Blob(fileName);
-        if (!rmBlob.existsInAdd() && !rmBlob.existsInCurCommit()) {
+        String id_Add = Blob.NameToIdInAddition(fileName);
+        String id_Com = Commit.NameToIdInMappingCurCom(fileName);
+        File cwdFile = join(CWD, fileName);
+        if (id_Add == null && id_Com == null) {
             System.out.println("No reason to remove the file.");
             System.exit(0);
         } else {
-            if (rmBlob.existsInAdd()) {
-                rmBlob.removeFromAdd();
+            if (id_Add != null) {
+                Blob.removeFromAdd(id_Add);
             }
-            if (rmBlob.existsInCurCommit()) {
-                rmBlob.toRm();
-                File cwdFile = join(CWD, fileName);
+            if (id_Com != null) {
+                Blob.toRm(id_Com, fileName);
                 if (cwdFile.exists()) {
                     cwdFile.delete();
                 }
