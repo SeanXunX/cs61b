@@ -1,8 +1,11 @@
 package gitlet;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Formatter;
+import java.util.Locale;
 
 import static gitlet.Utils.*;
 public class MyUtils {
@@ -36,9 +39,12 @@ public class MyUtils {
      * Prints date as required.
      */
     public static void printDate(Date date) {
-        Formatter dateFormat = new Formatter();
-        dateFormat.format("%ta %tb %te %tT %tY %tZ", date, date, date, date, date, date);
-        System.out.println("Date: " + dateFormat);
+        System.out.println("Date: " + dateToTimeStamp(date));
+    }
+
+    private static String dateToTimeStamp(Date date) {
+        DateFormat dateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.US);
+        return dateFormat.format(date);
     }
 
 }
