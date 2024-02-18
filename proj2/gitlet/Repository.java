@@ -4,8 +4,8 @@ package gitlet;
 //import com.sun.tools.javah.resources.version;
 //import net.sf.saxon.trans.SymbolicName;
 //import org.checkerframework.checker.units.qual.C;
-
-import net.sf.saxon.type.StringConverter;
+//
+//import net.sf.saxon.type.StringConverter;
 
 import java.io.File;
 import java.io.IOException;

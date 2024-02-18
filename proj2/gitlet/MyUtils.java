@@ -40,5 +40,5 @@ public class MyUtils {
         dateFormat.format("%ta %tb %te %tT %tY %tZ", date, date, date, date, date, date);
         System.out.println("Date: " + dateFormat);
     }
-    
+
 }
