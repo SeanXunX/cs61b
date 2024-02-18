@@ -21,7 +21,6 @@ public class Blob implements Serializable {
     public static final File GITLET_DIR = join(CWD, ".gitlet");
     public static final File add_DIR = join(GITLET_DIR, "stage", "addition");
     public static final File rm_DIR = join(GITLET_DIR, "stage", "removal");
-    public static final File commits_DIR = join(GITLET_DIR, "objects", "commits");
     public static final File blobs_DIR = join(GITLET_DIR, "objects", "blobs");
 
 
