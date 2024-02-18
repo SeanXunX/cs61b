@@ -3,10 +3,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static gitlet.Utils.*;
 import static gitlet.MyUtils.*;
@@ -69,7 +66,6 @@ public class Commit implements Serializable {
     private String id;
 
 
-
     /**
      * initial commit
      */
@@ -102,13 +98,27 @@ public class Commit implements Serializable {
      * Moves the files in the addition to the object.
      */
     private void addToObjects() {
+        // 创建迭代器
+        Iterator<Map.Entry<String, String>> iterator = idToName.entrySet().iterator();
+
         for (Map.Entry<String, String> entry : Blob.getAddFiles().entrySet()) {
             //Removes the old version in the idToName mapping and updates.
-            for (Map.Entry<String, String> entryTracked : idToName.entrySet()) {
+
+//            for (Map.Entry<String, String> entryTracked : idToName.entrySet()) {
+//                if (entryTracked.getValue().equals(entry.getValue())) {
+//                    idToName.remove(entryTracked.getKey());
+//                }
+//            }
+
+            // 使用迭代器遍历HashMap并删除特定元素
+            while (iterator.hasNext()) {
+                Map.Entry<String, String> entryTracked = iterator.next();
                 if (entryTracked.getValue().equals(entry.getValue())) {
-                    idToName.remove(entryTracked.getKey());
+                    iterator.remove(); // 安全地删除当前元素
                 }
             }
+
+
             idToName.put(entry.getKey(), entry.getValue());
             File src = join(add_DIR, entry.getKey());
             File tar = join(blobs_DIR, entry.getKey());
@@ -128,7 +138,6 @@ public class Commit implements Serializable {
         }
         return null;
     }
-
 
 
     public static String NameToIdInMappingCurCom(String fileName) {
