@@ -98,8 +98,7 @@ public class Commit implements Serializable {
      * Moves the files in the addition to the object.
      */
     private void addToObjects() {
-        // 创建迭代器
-        Iterator<Map.Entry<String, String>> iterator = idToName.entrySet().iterator();
+
 
         for (Map.Entry<String, String> entry : Blob.getAddFiles().entrySet()) {
             //Removes the old version in the idToName mapping and updates.
@@ -110,13 +109,10 @@ public class Commit implements Serializable {
 //                }
 //            }
 
+            // 创建迭代器
             // 使用迭代器遍历HashMap并删除特定元素
-            while (iterator.hasNext()) {
-                Map.Entry<String, String> entryTracked = iterator.next();
-                if (entryTracked.getValue().equals(entry.getValue())) {
-                    iterator.remove(); // 安全地删除当前元素
-                }
-            }
+            // 安全地删除当前元素
+            idToName.entrySet().removeIf(entryTracked -> entryTracked.getValue().equals(entry.getValue()));
 
 
             idToName.put(entry.getKey(), entry.getValue());
