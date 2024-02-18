@@ -92,7 +92,7 @@ public class Commit implements Serializable {
         parent = headCommit.id;
         second_parent = null;
         idToName = new HashMap<>();
-        this.idToName.putAll(headCommit.getIdToName());
+        idToName.putAll(headCommit.getIdToName());
         id = generateId();
         addToObjects();
         rmFromMapping();
@@ -106,7 +106,7 @@ public class Commit implements Serializable {
             //Removes the old version in the idToName mapping and updates.
             for (Map.Entry<String, String> entryTracked : idToName.entrySet()) {
                 if (entryTracked.getValue().equals(entry.getValue())) {
-                    idToName.remove(entry.getKey(), entry.getValue());
+                    idToName.remove(entryTracked.getKey());
                 }
             }
             idToName.put(entry.getKey(), entry.getValue());
