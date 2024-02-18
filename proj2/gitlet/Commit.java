@@ -128,6 +128,8 @@ public class Commit implements Serializable {
         return null;
     }
 
+
+
     public static String NameToIdInMappingCurCom(String fileName) {
         Commit curCommit = getHeadCommit();
         return curCommit.NameToIdInMapping(fileName);
@@ -176,6 +178,18 @@ public class Commit implements Serializable {
      */
     public boolean hasBlob(String id) {
         return idToName.containsKey(id);
+    }
+
+    /**
+     * Returns if the commit has the file with fileName.
+     */
+    public boolean hasFile(String fileName) {
+        for (Map.Entry<String, String> entry : idToName.entrySet()) {
+            if (entry.getValue().equals(fileName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

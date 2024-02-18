@@ -5,6 +5,8 @@ package gitlet;
 //import net.sf.saxon.trans.SymbolicName;
 //import org.checkerframework.checker.units.qual.C;
 
+import net.sf.saxon.type.StringConverter;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -766,4 +768,174 @@ public class Repository {
         writeContents(HEAD, tarCommit.getId());
     }
 
+    /**
+     * Merges files from the given branch into the current branch.
+     * <p>
+     * If the split point is the same commit as the given branch, then we do nothing;
+     * the merge is complete, and the operation ends with the message Given branch is an ancestor of the current branch.
+     * <p>
+     * If the split point is the current branch, then the effect is to check out the given branch,
+     * and the operation ends after printing the message Current branch fast-forwarded.
+     * <p>
+     * Otherwise:
+     * <p>
+     * 1. Any files that have been modified in the given branch since the split point,
+     * but not modified in the current branch since the split point should be changed to
+     * their versions in the given branch (checked out from the commit at the front of the given branch).
+     * These files should then all be automatically staged.
+     * To clarify, if a file is “modified in the given branch since the split point”
+     * this means the version of the file as it exists in the commit at the front of
+     * the given branch has different content from the version of the file at the split point.
+     * Remember: blobs are content addressable!
+     * <p>
+     * 2. Any files that have been modified in the current branch but not in the given branch
+     * since the split point should stay as they are.
+     * <p>
+     * 3. Any files that have been modified in both the current and given branch in the same way
+     * (i.e., both files now have the same content or were both removed) are left unchanged
+     * by the merge. If a file was removed from both the current and given branch,
+     * but a file of the same name is present in the working directory,
+     * it is left alone and continues to be absent (not tracked nor staged) in the merge.
+     * <p>
+     * 4. Any files that were not present at the split point and are present
+     * only in the current branch should remain as they are.
+     * <p>
+     * 5. Any files that were not present at the split point and are present
+     * only in the given branch should be checked out and staged.
+     * <p>
+     * 6. Any files present at the split point, unmodified in the current branch,
+     * and absent in the given branch should be removed (and untracked).
+     * <p>
+     * 7. Any files present at the split point, unmodified in the given branch,
+     * and absent in the current branch should remain absent.
+     */
+    public static void merge(String branchName) {
+        notInitializedError();
+
+        Commit splitPoint = getSplitPoint(branchName);
+        Commit cur = Commit.getHeadCommit();
+        Commit bran = Commit.getHeadCommitOfBranch(branchName);
+
+        if (splitPoint == bran) {
+            System.out.println("Given branch is an ancestor of the current branch.");
+        } else if (splitPoint == cur) {
+            checkout_branchName(branchName);
+            System.out.println("Current branch fast-forwarded.");
+        } else {
+            //Exists in the split point
+            for (Map.Entry<String, String> entry : splitPoint.getIdToName().entrySet()) {
+                String fileName = entry.getValue();
+                String fileId = entry.getKey();
+                if (cur.hasBlob(fileId)) {
+                    //Not modified in cur
+                    if (bran.hasFile(fileName) && !bran.hasBlob(fileId)) {
+                        checkout_idAndFileName(bran.getId(), fileName);
+                        commit("Merged " + branchName + "into " + curBranchName + ".");
+                    } else if (!bran.hasFile(fileName)) {
+                        //Todo: Figure out whether the file should be staged as removal.
+                        rm(fileName);
+                        commit("Merged " + branchName + "into " + curBranchName + ".");
+                    }
+                }
+            }
+
+            //Exists in the bran
+            for (Map.Entry<String, String> entry : bran.getIdToName().entrySet()) {
+                String fileName = entry.getValue();
+                String fileId = entry.getKey();
+                File cwdFile = join(CWD, fileName);
+
+                if (!splitPoint.hasFile(fileName)) {
+                    //Not exists in the split point
+                    if (!cur.hasFile(fileName)) {
+                        //Not exists in the cur
+                        checkout_idAndFileName(bran.getId(), fileName);
+                        commit("Merged " + branchName + "into " + curBranchName + ".");
+                    }
+                }
+
+                //Modified in different ways
+                //CONFLICTED
+                if (!splitPoint.hasBlob(fileId)) {
+                    //modified in bran
+                    if (!cur.hasFile(fileName)) {
+                        //File in cur is absent.
+                        String branCon = getContents(fileName, bran);
+                        String curCon = "\n";
+                        writeContents(cwdFile, mergeContents(curCon, branCon));
+                        add(fileName);
+                        System.out.println("Encountered a merge conflict.");
+                    } else if (!cur.hasBlob(fileId)) {
+                        //File exists in cur, but different with that in bran
+                        String branCon = getContents(fileName, bran);
+                        String curCon = getContents(fileName, cur);
+                        writeContents(cwdFile, mergeContents(curCon, branCon));
+                        add(fileName);
+                        System.out.println("Encountered a merge conflict.");
+                    }
+                }
+            }
+
+            for (Map.Entry<String, String> entry : cur.getIdToName().entrySet()) {
+                String fileName = entry.getValue();
+                String fileId = entry.getKey();
+                File cwdFile = join(CWD, fileName);
+
+                //Modified in different ways
+                if (!splitPoint.hasBlob(fileId)) {
+                    //modified in bran
+                    if (!bran.hasFile(fileName)) {
+                        //Not exists in bran
+                        String branCon = "\n";
+                        String curCon = getContents(fileName, cur);
+                        writeContents(cwdFile, mergeContents(curCon, branCon));
+                        add(fileName);
+                        System.out.println("Encountered a merge conflict.");
+                    }
+                }
+            }
+        }
+    }
+
+    private static String mergeContents(String curCon, String branCon) {
+        return "<<<<<<< HEAD\n" + curCon + "=======\n" + branCon + ">>>>>>>";
+    }
+
+    /**
+     * returns the content of the file tracked by the commit
+     */
+    private static String getContents(String fileName, Commit commit) {
+        String fileId = commit.NameToIdInMapping(fileName);
+        if (fileId != null) {
+            //file exists
+            String contents = readContentsAsString(join(blobs_DIR, fileId));
+            return contents;
+        } else {
+            return null;
+        }
+    }
+
+//    /**
+//     * removes the file from CWD and staging area, also not staged
+//     */
+//    private static void removeFile(String fileName) {
+//        Commit cur = Commit.getHeadCommit();
+//        String fileId = cur.NameToIdInMapping(fileName);
+//        rm(fileName);
+//        File rmFile = join(rm_DIR, fileId);
+//        if (rmFile.exists()) {
+//            rmFile.delete();
+//        }
+//        Blob.getRmFiles().remove(fileId);
+//    }
+
+    private static Commit getSplitPoint(String branchName) {
+        Commit cur = Commit.getHeadCommit();
+        Commit bran = Commit.getHeadCommitOfBranch(branchName);
+        while (cur != bran) {
+            cur = (cur.parentCommit() == null) ? Commit.getHeadCommitOfBranch(branchName) : cur.parentCommit();
+            bran = (bran.parentCommit() == null) ? Commit.getHeadCommit() : bran.parentCommit();
+        }
+        return cur;
+    }
 }
