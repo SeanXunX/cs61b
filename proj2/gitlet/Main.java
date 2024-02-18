@@ -21,7 +21,7 @@ public class Main {
      * Usage: java gitlet.Main ARGS, where ARGS contains
      * <COMMAND> <OPERAND1> <OPERAND2> ...
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             System.exit(0);
@@ -37,7 +37,11 @@ public class Main {
         switch (firstArg) {
             case "init":
                 validateNumArgs(args, 1);
-                Repository.init();
+                try {
+                    Repository.init();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
             case "add":
                 validateNumArgs(args, 2);
