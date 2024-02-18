@@ -91,7 +91,7 @@ public class Commit implements Serializable {
         date = new Date();
         parent = headCommit.id;
         second_parent = null;
-        headCommit.idToName.putAll(idToName);
+        this.idToName.putAll(headCommit.getIdToName());
         id = generateId();
         addToObjects();
         rmFromMapping();
