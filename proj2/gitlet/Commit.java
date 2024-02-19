@@ -99,28 +99,41 @@ public class Commit implements Serializable {
      */
     private void addToObjects() {
 
+        Iterator<Map.Entry<String, String>> iterator = Blob.getAddFiles().entrySet().iterator();
 
-        for (Map.Entry<String, String> entry : Blob.getAddFiles().entrySet()) {
-            //Removes the old version in the idToName mapping and updates.
-
-//            for (Map.Entry<String, String> entryTracked : idToName.entrySet()) {
-//                if (entryTracked.getValue().equals(entry.getValue())) {
-//                    idToName.remove(entryTracked.getKey());
-//                }
-//            }
-
-            // 创建迭代器
-            // 使用迭代器遍历HashMap并删除特定元素
-            // 安全地删除当前元素
+        while (iterator.hasNext()) {
+            Map.Entry<String, String> entry = iterator.next();
+            // Removes the old version in the idToName mapping and updates.
             idToName.entrySet().removeIf(entryTracked -> entryTracked.getValue().equals(entry.getValue()));
-
-
             idToName.put(entry.getKey(), entry.getValue());
             File src = join(add_DIR, entry.getKey());
             File tar = join(blobs_DIR, entry.getKey());
             move(src, tar);
-            Blob.getAddFiles().remove(entry.getKey());
+            // Removes the processed entry from Blob.getAddFiles().
+            iterator.remove();
         }
+
+//        for (Map.Entry<String, String> entry : Blob.getAddFiles().entrySet()) {
+//            //Removes the old version in the idToName mapping and updates.
+//
+////            for (Map.Entry<String, String> entryTracked : idToName.entrySet()) {
+////                if (entryTracked.getValue().equals(entry.getValue())) {
+////                    idToName.remove(entryTracked.getKey());
+////                }
+////            }
+//
+//            // 创建迭代器
+//            // 使用迭代器遍历HashMap并删除特定元素
+//            // 安全地删除当前元素
+//            idToName.entrySet().removeIf(entryTracked -> entryTracked.getValue().equals(entry.getValue()));
+//
+//
+//            idToName.put(entry.getKey(), entry.getValue());
+//            File src = join(add_DIR, entry.getKey());
+//            File tar = join(blobs_DIR, entry.getKey());
+//            move(src, tar);
+//            Blob.getAddFiles().remove(entry.getKey());
+//        }
     }
 
     /**
