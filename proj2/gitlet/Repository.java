@@ -816,10 +816,10 @@ public class Repository {
         Commit cur = Commit.getHeadCommit();
         Commit bran = Commit.getHeadCommitOfBranch(branchName);
 
-        if (cur != bran) {
-            if (splitPoint == bran) {
+        if (!cur.getId().equals(bran.getId())) {
+            if (!splitPoint.getId().equals(bran.getId())) {
                 System.out.println("Given branch is an ancestor of the current branch.");
-            } else if (splitPoint == cur) {
+            } else if (!splitPoint.getId().equals(cur.getId())) {
                 checkout_branchName(branchName);
                 System.out.println("Current branch fast-forwarded.");
             } else {
