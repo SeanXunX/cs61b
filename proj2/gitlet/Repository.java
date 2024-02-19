@@ -553,10 +553,13 @@ public class Repository {
         char[] abbs = abbId.toCharArray();
         List<String> commitIds = plainFilenamesIn(commits_DIR);
         for (String fullId : commitIds) {
-            boolean flag = false;
+            boolean flag = true;
             char[] temps = fullId.toCharArray();
             for (int i = 0; i < abbs.length; i++) {
-                flag = (abbs[i] == temps[i]);
+                if (abbs[i] != temps[i]) {
+                    flag = false;
+                    break;
+                }
             }
             if (flag) {
                 return fullId;
