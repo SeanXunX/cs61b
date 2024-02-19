@@ -243,7 +243,10 @@ public class Commit implements Serializable {
         return idToName;
     }
     public Commit parentCommit() {
-        File parentFile = join(commits_DIR, parent);
-        return readObject(parentFile, Commit.class);
+        if (parent != null) {
+            File parentFile = join(commits_DIR, parent);
+            return readObject(parentFile, Commit.class);
+        }
+        return null;
     }
 }
