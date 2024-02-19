@@ -75,9 +75,17 @@ public class Main {
                 //args.length 2 3 4
                 switch (args.length) {
                     case 3:
+                        if (!args[1].equals("--")) {
+                            System.out.println("Incorrect operands.");
+                            System.exit(0);
+                        }
                         Repository.checkout_fileName(args[2]);
                         break;
                     case 4:
+                        if (!args[2].equals("--")) {
+                            System.out.println("Incorrect operands.");
+                            System.exit(0);
+                        }
                         Repository.checkout_idAndFileName(args[1], args[3]);
                         break;
                     case 2:
