@@ -555,7 +555,7 @@ public class Repository {
         for (String fullId : commitIds) {
             boolean flag = false;
             char[] temps = fullId.toCharArray();
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < abbs.length; i++) {
                 flag = (abbs[i] == temps[i]);
             }
             if (flag) {
@@ -569,9 +569,7 @@ public class Repository {
      * According to the given id, which may be abbreviated, returns the target commit.
      */
     private static Commit getTarCommitFromId(String commitId) {
-        if (commitId.length() == 6) {
-            commitId = AbbToFull(commitId);
-        }
+        commitId = AbbToFull(commitId);
         if (commitId == null) {
             System.out.println("No commit with that id exists.");
             System.exit(0);
