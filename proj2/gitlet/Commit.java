@@ -161,9 +161,9 @@ public class Commit implements Serializable {
         Iterator<Map.Entry<String, String>> iterator = Blob.getRmFiles().entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, String> entry = iterator.next();
-            iterator.remove();
+            idToName.remove(entry.getKey());
             join(rm_DIR, entry.getKey()).delete();
-            Blob.getRmFiles().remove(entry.getKey());
+            iterator.remove();
         }
     }
 
