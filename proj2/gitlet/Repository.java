@@ -904,7 +904,7 @@ public class Repository {
                 }
 
                 if (!isConflicted) {
-                    commit("Merged " + branchName + "into " + curBranchName + ".");
+                    commit("Merged " + branchName + " into " + curBranchName + ".");
                 } else {
                     System.out.println("Encountered a merge conflict.");
                 }
