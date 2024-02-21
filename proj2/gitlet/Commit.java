@@ -94,6 +94,19 @@ public class Commit implements Serializable {
         rmFromMapping();
     }
 
+    public Commit(String message, String second_parentId) {
+        Commit headCommit = getHeadCommit();
+        this.message = message;
+        date = new Date();
+        parent = headCommit.id;
+        second_parent = second_parentId;
+        idToName = new HashMap<>();
+        idToName.putAll(headCommit.getIdToName());
+        id = generateId();
+        addToObjects();
+        rmFromMapping();
+    }
+
     /**
      * Moves the files in the addition to the object.
      */
@@ -112,28 +125,6 @@ public class Commit implements Serializable {
             // Removes the processed entry from Blob.getAddFiles().
             iterator.remove();
         }
-
-//        for (Map.Entry<String, String> entry : Blob.getAddFiles().entrySet()) {
-//            //Removes the old version in the idToName mapping and updates.
-//
-////            for (Map.Entry<String, String> entryTracked : idToName.entrySet()) {
-////                if (entryTracked.getValue().equals(entry.getValue())) {
-////                    idToName.remove(entryTracked.getKey());
-////                }
-////            }
-//
-//            // 创建迭代器
-//            // 使用迭代器遍历HashMap并删除特定元素
-//            // 安全地删除当前元素
-//            idToName.entrySet().removeIf(entryTracked -> entryTracked.getValue().equals(entry.getValue()));
-//
-//
-//            idToName.put(entry.getKey(), entry.getValue());
-//            File src = join(add_DIR, entry.getKey());
-//            File tar = join(blobs_DIR, entry.getKey());
-//            move(src, tar);
-//            Blob.getAddFiles().remove(entry.getKey());
-//        }
     }
 
     /**

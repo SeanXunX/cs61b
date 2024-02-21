@@ -221,6 +221,27 @@ public class Repository {
     }
 
     /**
+     * Commit after merge
+     */
+    private static void MergeCommit(String message, String second_parentId) {
+        notInitializedError();
+        //Failure cases
+        if (message.isEmpty()) {
+            System.out.println("Please enter a commit message.");
+            System.exit(0);
+        }
+        if (Blob.getAddFiles().size() + Blob.getRmFiles().size() == 0) {
+            System.out.println("No changes added to the commit.");
+            System.exit(0);
+        }
+
+        Commit newCommit = new Commit(message, second_parentId);
+        writeContents(HEAD, newCommit.getId());
+        writeContents(join(heads_DIR, curBranchName), newCommit.getId());
+        newCommit.saveCommit();
+    }
+
+    /**
      * Unstage the file if it is currently staged for addition.
      * <p>
      * If the file is tracked in the current commit, stage it for removal
@@ -307,11 +328,18 @@ public class Repository {
     private static void printLog(Commit curCommit) {
         System.out.print("===\n" + "commit " + curCommit.getId() + "\n");
         if (curCommit.getSecond_parent() != null) {
-            System.out.println("Merge: " + curCommit.getParent() + " " + curCommit.getSecond_parent());
+            System.out.println("Merge: " + sevenAbb(curCommit.getParent()) + " " + sevenAbb(curCommit.getSecond_parent()));
         }
         printDate(curCommit.getDate());
         System.out.println(curCommit.getMessage());
         System.out.println();
+    }
+
+    /**
+     * First seven digits of id.
+     */
+    private static String sevenAbb(String id) {
+        return id.substring(0, 7);
     }
 
     /**
@@ -921,7 +949,7 @@ public class Repository {
                     String fileId = entry.getKey();
                     File cwdFile = join(CWD, fileName);
 
-                    if (!bran.hasFile(fileName) && cur.hasFile(fileName) && !cur.hasBlob(fileId)) {
+                    if (!bran.hasFile(fileName) && splitPoint.hasFile(fileName) && !splitPoint.hasBlob(fileId)) {
                         //absent in bran, modified in cur, original in split point
                         String branCon = "\n";
                         String curCon = getContents(fileName, cur);
@@ -931,7 +959,7 @@ public class Repository {
                     }
                 }
 
-                commit("Merged " + branchName + " into " + curBranchName + ".");
+                MergeCommit("Merged " + branchName + " into " + curBranchName + ".", bran.getId());
                 if (isConflicted) {
                     System.out.println("Encountered a merge conflict.");
                 }
