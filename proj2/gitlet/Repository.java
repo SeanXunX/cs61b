@@ -936,7 +936,7 @@ public class Repository {
                             isConflicted = true;
                         } else if (!cur.hasFile(fileName)) {
                             String branCon = getContents(fileName, bran);
-                            String curCon = "\n";
+                            String curCon = "";
                             writeContents(cwdFile, mergeContents(curCon, branCon));
                             add(fileName);
                             isConflicted = true;
@@ -951,7 +951,7 @@ public class Repository {
 
                     if (!bran.hasFile(fileName) && splitPoint.hasFile(fileName) && !splitPoint.hasBlob(fileId)) {
                         //absent in bran, modified in cur, original in split point
-                        String branCon = "\n";
+                        String branCon = "";
                         String curCon = getContents(fileName, cur);
                         writeContents(cwdFile, mergeContents(curCon, branCon));
                         add(fileName);
