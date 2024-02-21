@@ -544,6 +544,7 @@ public class Repository {
             System.out.println("File does not exist in that commit.");
             System.exit(0);
         }
+        OverwriteError(fileName);
         File src = join(blobs_DIR, id);
         File cwdPath = join(CWD, fileName);
         writeContents(cwdPath, readContentsAsString(src));
@@ -809,6 +810,25 @@ public class Repository {
      * <p>
      * 7. Any files present at the split point, unmodified in the given branch,
      * and absent in the current branch should remain absent.
+     * <p>
+     * <p>
+     * Failure cases:
+     * <p>
+     * If there are staged additions or removals present,
+     * print the error message You have uncommitted changes. and exit.
+     * <p>
+     * If a branch with the given name does not exist,
+     * print the error message A branch with that name does not exist.
+     * <p>
+     * If attempting to merge a branch with itself,
+     * print the error message Cannot merge a branch with itself.
+     * <p>
+     * If merge would generate an error because the commit that it does has no changes in it,
+     * just let the normal commit error message for this go through.
+     * <p>
+     * If an untracked file in the current commit would be overwritten or deleted by the merge,
+     * print There is an untracked file in the way; delete it, or add and commit it first. and exit;
+     * perform this check before doing anything else.
      */
     public static void merge(String branchName) {
         notInitializedError();
@@ -817,7 +837,15 @@ public class Repository {
         Commit cur = Commit.getHeadCommit();
         Commit bran = Commit.getHeadCommitOfBranch(branchName);
 
-        if (!cur.getId().equals(bran.getId())) {
+        if (Blob.getAddFiles().size() + Blob.getRmFiles().size() > 0) {
+            System.out.println("You have uncommitted changes.");
+            System.exit(0);
+        }
+
+        if (cur.getId().equals(bran.getId())) {
+            System.out.println("Cannot merge a branch with itself.");
+            System.exit(0);
+        } else {
             if (splitPoint.getId().equals(bran.getId())) {
                 System.out.println("Given branch is an ancestor of the current branch.");
             } else if (splitPoint.getId().equals(cur.getId())) {
@@ -929,20 +957,6 @@ public class Repository {
         }
     }
 
-//    /**
-//     * removes the file from CWD and staging area, also not staged
-//     */
-//    private static void removeFile(String fileName) {
-//        Commit cur = Commit.getHeadCommit();
-//        String fileId = cur.NameToIdInMapping(fileName);
-//        rm(fileName);
-//        File rmFile = join(rm_DIR, fileId);
-//        if (rmFile.exists()) {
-//            rmFile.delete();
-//        }
-//        Blob.getRmFiles().remove(fileId);
-//    }
-
     private static Commit getSplitPoint(String branchName) {
         Commit cur = Commit.getHeadCommit();
         String curId = cur.getId();
@@ -955,5 +969,14 @@ public class Repository {
             branId = bran.getId();
         }
         return readObject(join(commits_DIR, curId), Commit.class);
+    }
+
+    private static void OverwriteError(String fileName) {
+        List<String> untrackedFNs = getUntrackedFileNames(); //file name not id
+        if (untrackedFNs.contains(fileName)) {
+            System.out.println("There is an untracked file in the way; " +
+                    "delete it, or add and commit it first.");
+            System.exit(0);
+        }
     }
 }
