@@ -940,7 +940,7 @@ public class Repository {
     }
 
     private static String mergeContents(String curCon, String branCon) {
-        return "<<<<<<< HEAD\n" + curCon + "=======\n" + branCon + ">>>>>>>";
+        return "<<<<<<< HEAD\n" + curCon + "=======\n" + branCon + ">>>>>>>\n";
     }
 
     /**
