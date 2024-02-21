@@ -220,8 +220,7 @@ public class Commit implements Serializable {
         if (branHead.exists()) {
             File headCommitPath = join(commits_DIR, readContentsAsString(branHead));
             if (!headCommitPath.exists()) {
-                System.out.println("A branch with that name does not exist.");
-                System.exit(0);
+                return null;
             }
             return readObject(headCommitPath, Commit.class);
         }

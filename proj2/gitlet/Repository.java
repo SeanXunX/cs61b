@@ -649,6 +649,10 @@ public class Repository {
             System.exit(0);
         }
         Commit tarCommit = Commit.getHeadCommitOfBranch(branchName);
+        if (tarCommit == null) {
+            System.out.println("No such branch exists.");
+            System.exit(0);
+        }
 
         UntrackedError(tarCommit);
         ClearCurTrackedCWD();
@@ -862,7 +866,7 @@ public class Repository {
         Commit cur = Commit.getHeadCommit();
         Commit bran = Commit.getHeadCommitOfBranch(branchName);
         if (bran == null) {
-            System.out.println("No such branch exists.");
+            System.out.println("A branch with that name does not exist.");
             System.exit(0);
         }
 
@@ -991,7 +995,7 @@ public class Repository {
         String curId = cur.getId();
         Commit bran = Commit.getHeadCommitOfBranch(branchName);
         if (bran == null) {
-            System.out.println("No such branch exists.");
+            System.out.println("A branch with that name does not exist.");
             System.exit(0);
         }
         String branId = bran.getId();
