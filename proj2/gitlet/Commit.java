@@ -216,12 +216,16 @@ public class Commit implements Serializable {
      * Get the given branch's HEAD points
      */
     public static Commit getHeadCommitOfBranch(String branchName) {
-        File headCommitPath = join(commits_DIR, readContentsAsString(join(heads_DIR, branchName)));
-        if (!headCommitPath.exists()) {
-            System.out.println("A branch with that name does not exist.");
-            System.exit(0);
+        File branHead = join(heads_DIR, branchName);
+        if (branHead.exists()) {
+            File headCommitPath = join(commits_DIR, readContentsAsString(branHead));
+            if (!headCommitPath.exists()) {
+                System.out.println("A branch with that name does not exist.");
+                System.exit(0);
+            }
+            return readObject(headCommitPath, Commit.class);
         }
-        return readObject(headCommitPath, Commit.class);
+        return null;
     }
 
     public String getMessage() {

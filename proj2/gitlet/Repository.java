@@ -223,21 +223,18 @@ public class Repository {
     /**
      * Commit after merge
      */
-    private static void MergeCommit(String message, String second_parentId) {
+    private static void MergeCommit(String message, String second_parentId, String branName) {
         notInitializedError();
         //Failure cases
         if (message.isEmpty()) {
             System.out.println("Please enter a commit message.");
             System.exit(0);
         }
-        if (Blob.getAddFiles().size() + Blob.getRmFiles().size() == 0) {
-            System.out.println("No changes added to the commit.");
-            System.exit(0);
-        }
 
         Commit newCommit = new Commit(message, second_parentId);
         writeContents(HEAD, newCommit.getId());
         writeContents(join(heads_DIR, curBranchName), newCommit.getId());
+        writeContents(join(heads_DIR, branName), newCommit.getId());
         newCommit.saveCommit();
     }
 
@@ -864,6 +861,10 @@ public class Repository {
         Commit splitPoint = getSplitPoint(branchName);
         Commit cur = Commit.getHeadCommit();
         Commit bran = Commit.getHeadCommitOfBranch(branchName);
+        if (bran == null) {
+            System.out.println("No such branch exists.");
+            System.exit(0);
+        }
 
         if (Blob.getAddFiles().size() + Blob.getRmFiles().size() > 0) {
             System.out.println("You have uncommitted changes.");
@@ -959,7 +960,7 @@ public class Repository {
                     }
                 }
 
-                MergeCommit("Merged " + branchName + " into " + curBranchName + ".", bran.getId());
+                MergeCommit("Merged " + branchName + " into " + curBranchName + ".", bran.getId(), branchName);
                 if (isConflicted) {
                     System.out.println("Encountered a merge conflict.");
                 }
@@ -989,6 +990,10 @@ public class Repository {
         Commit cur = Commit.getHeadCommit();
         String curId = cur.getId();
         Commit bran = Commit.getHeadCommitOfBranch(branchName);
+        if (bran == null) {
+            System.out.println("No such branch exists.");
+            System.exit(0);
+        }
         String branId = bran.getId();
         while (!branId.equals(curId)) {
             cur = (cur.parentCommit() == null) ? Commit.getHeadCommitOfBranch(branchName) : cur.parentCommit();
