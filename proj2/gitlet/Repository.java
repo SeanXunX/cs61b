@@ -824,6 +824,7 @@ public class Repository {
                 checkout_branchName(branchName);
                 System.out.println("Current branch fast-forwarded.");
             } else {
+                boolean isConflicted = false;
                 //Exists in the split point
                 for (Map.Entry<String, String> entry : splitPoint.getIdToName().entrySet()) {
                     String fileName = entry.getValue();
@@ -832,11 +833,10 @@ public class Repository {
                         //Not modified in cur
                         if (bran.hasFile(fileName) && !bran.hasBlob(fileId)) {
                             checkout_idAndFileName(bran.getId(), fileName);
-                            commit("Merged " + branchName + "into " + curBranchName + ".");
+                            add(fileName);
                         } else if (!bran.hasFile(fileName)) {
                             //Todo: Figure out whether the file should be staged as removal.
                             rm(fileName);
-                            commit("Merged " + branchName + "into " + curBranchName + ".");
                         }
                     }
                 }
@@ -852,7 +852,7 @@ public class Repository {
                         if (!cur.hasFile(fileName)) {
                             //Not exists in the cur
                             checkout_idAndFileName(bran.getId(), fileName);
-                            commit("Merged " + branchName + "into " + curBranchName + ".");
+                            add(fileName);
                         }
                     }
 
@@ -867,6 +867,7 @@ public class Repository {
                             writeContents(cwdFile, mergeContents(curCon, branCon));
                             add(fileName);
                             System.out.println("Encountered a merge conflict.");
+                            isConflicted = true;
                         } else if (!cur.hasBlob(fileId)) {
                             //File exists in cur, but different with that in bran
                             String branCon = getContents(fileName, bran);
@@ -874,6 +875,7 @@ public class Repository {
                             writeContents(cwdFile, mergeContents(curCon, branCon));
                             add(fileName);
                             System.out.println("Encountered a merge conflict.");
+                            isConflicted = true;
                         }
                     }
                 }
@@ -893,8 +895,13 @@ public class Repository {
                             writeContents(cwdFile, mergeContents(curCon, branCon));
                             add(fileName);
                             System.out.println("Encountered a merge conflict.");
+                            isConflicted = true;
                         }
                     }
+                }
+
+                if (!isConflicted) {
+                    commit("Merged " + branchName + "into " + curBranchName + ".");
                 }
             }
         }

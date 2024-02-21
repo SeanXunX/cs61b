@@ -158,8 +158,10 @@ public class Commit implements Serializable {
      * Removes the files that are tracked in the removal from the current blob mapping.
      */
     private void rmFromMapping() {
-        for (Map.Entry<String, String> entry : Blob.getRmFiles().entrySet()) {
-            idToName.remove(entry.getKey());
+        Iterator<Map.Entry<String, String>> iterator = Blob.getRmFiles().entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, String> entry = iterator.next();
+            iterator.remove();
             join(rm_DIR, entry.getKey()).delete();
             Blob.getRmFiles().remove(entry.getKey());
         }
