@@ -905,18 +905,27 @@ public class Repository {
      * and exit;
      * perform this check before doing anything else.
      */
-    public static void nullError(Commit bran) {
+    private static void nullError(Commit bran) {
         if (bran == null) {
             System.out.println("A branch with that name does not exist.");
             System.exit(0);
         }
     }
-    public static void uncommittedError() {
+    private static void uncommittedError() {
         if (Blob.getAddFiles().size() + Blob.getRmFiles().size() > 0) {
             System.out.println("You have uncommitted changes.");
             System.exit(0);
         }
     }
+    private static void mergeSelfError() {
+        System.out.println("Cannot merge a branch with itself.");
+        System.exit(0);
+    }
+    private static void ancestorError() {
+        System.out.println("Given branch is an ancestor of the current branch.");
+        System.exit(0);
+    }
+
     public static void merge(String branchName) {
         notInitializedError();
         Commit splitPoint = getSplitPoint(branchName);
@@ -926,51 +935,39 @@ public class Repository {
         untrackedError(bran);
         uncommittedError();
         if (cur.getId().equals(bran.getId())) {
-            System.out.println("Cannot merge a branch with itself.");
-            System.exit(0);
+            mergeSelfError();
         } else {
             if (splitPoint.getId().equals(bran.getId())) {
-                System.out.println("Given branch is an ancestor of the current branch.");
-                System.exit(0);
+                ancestorError();
             } else if (splitPoint.getId().equals(cur.getId())) {
                 checkoutBranchName(branchName);
                 System.out.println("Current branch fast-forwarded.");
             } else {
                 boolean isConflicted = false;
-                //Exists in the split point
                 for (Map.Entry<String, String> entry : splitPoint.getIdToName().entrySet()) {
                     String fileName = entry.getValue();
                     String fileId = entry.getKey();
                     if (cur.hasBlob(fileId)) {
-                        //Not modified in cur
                         if (bran.hasFile(fileName) && !bran.hasBlob(fileId)) {
-                            //Exists in bran but modified
                             checkoutIdAndFileName(bran.getId(), fileName);
                             add(fileName);
                         } else if (!bran.hasFile(fileName)) {
-                            //Not exists in bran
                             rm(fileName);
                         }
                     }
                 }
-                //Exists in the bran
                 for (Map.Entry<String, String> entry : bran.getIdToName().entrySet()) {
                     String fileName = entry.getValue();
                     String fileId = entry.getKey();
                     File cwdFile = join(CWD, fileName);
                     if (!splitPoint.hasFile(fileName)) {
-                        //Not exists in the split point
                         if (!cur.hasFile(fileName)) {
-                            //Not exists in the cur
                             checkoutIdAndFileName(bran.getId(), fileName);
                             add(fileName);
                         }
                     }
-                    //CONFLICTED
                     if (!splitPoint.hasFile(fileName)) {
-                        //Absent in split point
                         if (cur.hasFile(fileName) && !cur.hasBlob(fileId)) {
-                            //File exists in cur, but different with that in bran
                             String branCon = getContents(fileName, bran);
                             String curCon = getContents(fileName, cur);
                             writeContents(cwdFile, mergeContents(curCon, branCon));
@@ -978,22 +975,17 @@ public class Repository {
                             isConflicted = true;
                         }
                     } else if (!splitPoint.hasBlob(fileId)) {
-                        //Original in split point, different from bran
                         if (cur.hasFile(fileName) && !cur.hasBlob(fileId)
                                 && !cur.hasBlob(splitPoint.nameToIdInMapping(fileName))) {
-                            //File exists in cur, but different with that in bran and split point
                             String branCon = getContents(fileName, bran);
                             String curCon = getContents(fileName, cur);
                             writeContents(cwdFile, mergeContents(curCon, branCon));
-                            add(fileName);
-                            isConflicted = true;
                         } else if (!cur.hasFile(fileName)) {
                             String branCon = getContents(fileName, bran);
-                            String curCon = "";
-                            writeContents(cwdFile, mergeContents(curCon, branCon));
-                            add(fileName);
-                            isConflicted = true;
+                            writeContents(cwdFile, mergeContents("", branCon));
                         }
+                        add(fileName);
+                        isConflicted = true;
                     }
                 }
                 for (Map.Entry<String, String> entry : cur.getIdToName().entrySet()) {
@@ -1002,21 +994,24 @@ public class Repository {
                     File cwdFile = join(CWD, fileName);
                     if (!bran.hasFile(fileName) && splitPoint.hasFile(fileName)
                             && !splitPoint.hasBlob(fileId)) {
-                        //absent in bran, modified in cur, original in split point
-                        String branCon = "";
                         String curCon = getContents(fileName, cur);
-                        writeContents(cwdFile, mergeContents(curCon, branCon));
+                        writeContents(cwdFile, mergeContents(curCon, ""));
                         add(fileName);
                         isConflicted = true;
                     }
                 }
-                mergeCommit("Merged " + branchName + " into " + curBranchName
-                        + ".", bran.getId(), branchName);
-                if (isConflicted) {
-                    System.out.println("Encountered a merge conflict.");
-                }
+                mergeCommit(comMes(branchName), bran.getId(), branchName);
+                conflictOut(isConflicted);
             }
         }
+    }
+    private static void conflictOut(boolean isConflicted) {
+        if (isConflicted) {
+            System.out.println("Encountered a merge conflict.");
+        }
+    }
+    private static String comMes(String branchName) {
+        return "Merged " + branchName + " into " + curBranchName + ".";
     }
 
     private static String mergeContents(String curCon, String branCon) {
