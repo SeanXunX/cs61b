@@ -878,12 +878,6 @@ public class Repository {
             System.exit(0);
         }
 
-        //todo : delete
-        System.out.println("splitPoint.getId()=" + splitPoint.getId());
-        System.out.println("bran.getId()=" + bran.getId());
-
-
-
         if (cur.getId().equals(bran.getId())) {
             System.out.println("Cannot merge a branch with itself.");
             System.exit(0);
@@ -1000,7 +994,9 @@ public class Repository {
         }
     }
 
-    //todo : 1.BFS one of the heads. 2.BFS the other find the first
+    /**
+     * DFS one of the heads. 2.BFS the other find the first
+     */
     private static void traverseDFS(Commit cur, HashSet<String> path) {
         if (cur != null) {
             path.add(cur.getId());
