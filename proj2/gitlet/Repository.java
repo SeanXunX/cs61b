@@ -537,9 +537,9 @@ public class Repository {
         return null;
     }
 
-    private static void printConditionFileNames(List<String> FS) {
-        if (FS != null) {
-            String[] fsArr = FS.toArray(new String[0]);
+    private static void printConditionFileNames(List<String> fs) {
+        if (fs != null) {
+            String[] fsArr = fs.toArray(new String[0]);
             Arrays.sort(fsArr);
             for (String name : fsArr) {
                 System.out.println(name);
@@ -925,7 +925,10 @@ public class Repository {
         System.out.println("Given branch is an ancestor of the current branch.");
         System.exit(0);
     }
-
+    private static void fastForward(String branchName) {
+        checkoutBranchName(branchName);
+        System.out.println("Current branch fast-forwarded.");
+    }
     public static void merge(String branchName) {
         notInitializedError();
         Commit splitPoint = getSplitPoint(branchName);
@@ -940,8 +943,7 @@ public class Repository {
             if (splitPoint.getId().equals(bran.getId())) {
                 ancestorError();
             } else if (splitPoint.getId().equals(cur.getId())) {
-                checkoutBranchName(branchName);
-                System.out.println("Current branch fast-forwarded.");
+                fastForward(branchName);
             } else {
                 boolean isConflicted = false;
                 for (Map.Entry<String, String> entry : splitPoint.getIdToName().entrySet()) {
@@ -980,12 +982,14 @@ public class Repository {
                             String branCon = getContents(fileName, bran);
                             String curCon = getContents(fileName, cur);
                             writeContents(cwdFile, mergeContents(curCon, branCon));
+                            add(fileName);
+                            isConflicted = true;
                         } else if (!cur.hasFile(fileName)) {
                             String branCon = getContents(fileName, bran);
                             writeContents(cwdFile, mergeContents("", branCon));
+                            add(fileName);
+                            isConflicted = true;
                         }
-                        add(fileName);
-                        isConflicted = true;
                     }
                 }
                 for (Map.Entry<String, String> entry : cur.getIdToName().entrySet()) {
