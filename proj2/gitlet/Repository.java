@@ -111,8 +111,8 @@ public class Repository {
      */
     public static void init() throws IOException {
         if (GITLET_DIR.exists()) {
-            System.out.println("A Gitlet version-control system already exists " +
-                    "in the current directory.");
+            System.out.println("A Gitlet version-control system already exists "
+                    + "in the current directory.");
             System.exit(0);
         }
 
@@ -237,7 +237,7 @@ public class Repository {
     /**
      * Commit after merge
      */
-    private static void MergeCommit(String message, String second_parentId, String branName) {
+    private static void mergeCommit(String message, String secondParentId, String branName) {
         notInitializedError();
         //Failure cases
         if (message.isEmpty()) {
@@ -245,7 +245,7 @@ public class Repository {
             System.exit(0);
         }
 
-        Commit newCommit = new Commit(message, second_parentId);
+        Commit newCommit = new Commit(message, secondParentId);
         writeContents(HEAD, newCommit.getId());
         writeContents(join(HEADS_DIR, curBranchName), newCommit.getId());
         writeContents(join(HEADS_DIR, branName), newCommit.getId());
@@ -264,18 +264,18 @@ public class Repository {
      */
     public static void rm(String fileName) {
         notInitializedError();
-        String id_Add = Blob.NameToIdInAddition(fileName);
-        String id_Com = Commit.NameToIdInMappingCurCom(fileName);
+        String idAdd = Blob.nameToIdInAddition(fileName);
+        String idCom = Commit.nameToIdInMappingCurCom(fileName);
         File cwdFile = join(CWD, fileName);
-        if (id_Add == null && id_Com == null) {
+        if (idAdd == null && idCom == null) {
             System.out.println("No reason to remove the file.");
             System.exit(0);
         } else {
-            if (id_Add != null) {
-                Blob.removeFromAdd(id_Add);
+            if (idAdd != null) {
+                Blob.removeFromAdd(idAdd);
             }
-            if (id_Com != null) {
-                Blob.toRm(id_Com, fileName);
+            if (idCom != null) {
+                Blob.toRm(idCom, fileName);
                 if (cwdFile.exists()) {
                     cwdFile.delete();
                 }
@@ -329,7 +329,7 @@ public class Repository {
     /**
      * Like log, except displays information about all commits ever made
      */
-    public static void global_log() {
+    public static void globalLog() {
         notInitializedError();
         Commit curCommit;
         List<String> commitNames = plainFilenamesIn(COMMITS_DIR);
@@ -346,9 +346,9 @@ public class Repository {
      */
     private static void printLog(Commit curCommit) {
         System.out.print("===\n" + "commit " + curCommit.getId() + "\n");
-        if (curCommit.getSecond_parent() != null) {
-            System.out.println("Merge: " + sevenAbb(curCommit.getParent()) + " " +
-                    sevenAbb(curCommit.getSecond_parent()));
+        if (curCommit.getSecondParent() != null) {
+            System.out.println("Merge: " + sevenAbb(curCommit.getParent()) + " "
+                    + sevenAbb(curCommit.getSecondParent()));
         }
         printDate(curCommit.getDate());
         System.out.println(curCommit.getMessage());
@@ -572,10 +572,10 @@ public class Repository {
      * The new version of the file is not staged.
      * <p>
      */
-    public static void checkout_fileName(String fileName) {
+    public static void checkoutFileName(String fileName) {
         notInitializedError();
         Commit curCommit = Commit.getHeadCommit();
-        String id = curCommit.NameToIdInMapping(fileName);
+        String id = curCommit.nameToIdInMapping(fileName);
         if (id == null) {
             System.out.println("File does not exist in that commit.");
             System.exit(0);
@@ -593,21 +593,21 @@ public class Repository {
      * The new version of the file is not staged.
      * <p>
      */
-    public static void checkout_idAndFileName(String commitId, String fileName) {
+    public static void checkoutIdAndFileName(String commitId, String fileName) {
         notInitializedError();
         Commit tarCommit = getTarCommitFromId(commitId);
-        String id = tarCommit.NameToIdInMapping(fileName);
+        String id = tarCommit.nameToIdInMapping(fileName);
         if (id == null) {
             System.out.println("File does not exist in that commit.");
             System.exit(0);
         }
-        OverwriteError(fileName);
+        overwriteError(fileName);
         File src = join(BLOBS_DIR, id);
         File cwdPath = join(CWD, fileName);
         writeContents(cwdPath, readContentsAsString(src));
     }
 
-    private static String AbbToFull(String abbId) {
+    private static String abbToFull(String abbId) {
         char[] abbs = abbId.toCharArray();
         List<String> commitIds = plainFilenamesIn(COMMITS_DIR);
         for (String fullId : commitIds) {
@@ -630,7 +630,7 @@ public class Repository {
      * According to the given id, which may be abbreviated, returns the target commit.
      */
     private static Commit getTarCommitFromId(String commitId) {
-        commitId = AbbToFull(commitId);
+        commitId = abbToFull(commitId);
         if (commitId == null) {
             System.out.println("No commit with that id exists.");
             System.exit(0);
@@ -675,7 +675,7 @@ public class Repository {
      * (see Failure cases below).
      * <p>
      */
-    public static void checkout_branchName(String branchName) {
+    public static void checkoutBranchName(String branchName) {
         notInitializedError();
         List<String> branchNames = plainFilenamesIn(HEADS_DIR);
         if (branchName.equals(curBranchName)) {
@@ -692,19 +692,19 @@ public class Repository {
             System.exit(0);
         }
 
-        UntrackedError(tarCommit);
-        ClearCurTrackedCWD();
-        AddTarTrackedCWD(tarCommit);
+        untrackedError(tarCommit);
+        clearCurTrackedCWD();
+        addTarTrackedCWD(tarCommit);
 
-        ClearStaging();
-        SetCurBranch(branchName);
+        clearStaging();
+        setCurBranch(branchName);
         writeContents(HEAD, tarCommit.getId());
     }
 
     /**
      * Add the files which are tracked by the target Commit to CWD
      */
-    private static void AddTarTrackedCWD(Commit tarCommit) {
+    private static void addTarTrackedCWD(Commit tarCommit) {
         for (Map.Entry<String, String> entry : tarCommit.getIdToName().entrySet()) {
             File cwdPathCur = join(CWD, entry.getValue());
             writeContentFromFile(join(BLOBS_DIR, entry.getKey()), cwdPathCur);
@@ -714,7 +714,7 @@ public class Repository {
     /**
      * Clear the tracked files in CWD.
      */
-    private static void ClearCurTrackedCWD() {
+    private static void clearCurTrackedCWD() {
         Commit curCommit = Commit.getHeadCommit();
         for (Map.Entry<String, String> entry : curCommit.getIdToName().entrySet()) {
             File cwdPathCur = join(CWD, entry.getValue());
@@ -728,24 +728,24 @@ public class Repository {
      * print There is an untracked file in the way; delete it, or add and commit it first.
      * and exit;
      */
-    private static void UntrackedError(Commit tarCommit) {
+    private static void untrackedError(Commit tarCommit) {
         List<String> untrackedFNs = getUntrackedFileNames(); //file name not id
         for (String name : tarCommit.getIdToName().values()) {
             if (untrackedFNs.contains(name)) {
-                System.out.println("There is an untracked file in the way; delete it, " +
-                        "or add and commit it first.");
+                System.out.println("There is an untracked file in the way; delete it, "
+                        + "or add and commit it first.");
                 System.exit(0);
             }
         }
     }
 
-    private static void SetCurBranch(String branchName) {
+    private static void setCurBranch(String branchName) {
         //Change the current branch
         curBranchName = branchName;
         Main.serialized.setCurBranchName(curBranchName);
     }
 
-    private static void ClearStaging() {
+    private static void clearStaging() {
         //Clear the staging area.
         clearStagingArea(ADD_DIR);
         Blob.getAddFiles().clear();
@@ -797,7 +797,7 @@ public class Repository {
      * If you try to remove the branch you’re currently on, aborts, printing the error message
      * Cannot remove the current branch.
      */
-    public static void rm_branch(String tarBranchName) {
+    public static void rmBranch(String tarBranchName) {
         notInitializedError();
         File tarBranch = join(HEADS_DIR, tarBranchName);
         if (!tarBranch.exists()) {
@@ -833,10 +833,10 @@ public class Repository {
     public static void reset(String commitId) {
         notInitializedError();
         Commit tarCommit = getTarCommitFromId(commitId);
-        UntrackedError(tarCommit);
-        ClearCurTrackedCWD();
-        AddTarTrackedCWD(tarCommit);
-        ClearStaging();
+        untrackedError(tarCommit);
+        clearCurTrackedCWD();
+        addTarTrackedCWD(tarCommit);
+        clearStaging();
         writeContents(HEAD, tarCommit.getId());
         writeContents(join(HEADS_DIR, curBranchName), tarCommit.getId());
     }
@@ -916,7 +916,7 @@ public class Repository {
             System.exit(0);
         }
 
-        UntrackedError(bran);
+        untrackedError(bran);
 
         if (Blob.getAddFiles().size() + Blob.getRmFiles().size() > 0) {
             System.out.println("You have uncommitted changes.");
@@ -931,7 +931,7 @@ public class Repository {
                 System.out.println("Given branch is an ancestor of the current branch.");
                 System.exit(0);
             } else if (splitPoint.getId().equals(cur.getId())) {
-                checkout_branchName(branchName);
+                checkoutBranchName(branchName);
                 System.out.println("Current branch fast-forwarded.");
             } else {
                 boolean isConflicted = false;
@@ -944,7 +944,7 @@ public class Repository {
                         //Not modified in cur
                         if (bran.hasFile(fileName) && !bran.hasBlob(fileId)) {
                             //Exists in bran but modified
-                            checkout_idAndFileName(bran.getId(), fileName);
+                            checkoutIdAndFileName(bran.getId(), fileName);
                             add(fileName);
                         } else if (!bran.hasFile(fileName)) {
                             //Not exists in bran
@@ -963,7 +963,7 @@ public class Repository {
                         //Not exists in the split point
                         if (!cur.hasFile(fileName)) {
                             //Not exists in the cur
-                            checkout_idAndFileName(bran.getId(), fileName);
+                            checkoutIdAndFileName(bran.getId(), fileName);
                             add(fileName);
                         }
                     }
@@ -982,7 +982,7 @@ public class Repository {
                     } else if (!splitPoint.hasBlob(fileId)) {
                         //Original in split point, different from bran
                         if (cur.hasFile(fileName) && !cur.hasBlob(fileId) &&
-                                !cur.hasBlob(splitPoint.NameToIdInMapping(fileName))) {
+                                !cur.hasBlob(splitPoint.nameToIdInMapping(fileName))) {
                             //File exists in cur, but different with that in bran and split point
                             String branCon = getContents(fileName, bran);
                             String curCon = getContents(fileName, cur);
@@ -1015,8 +1015,8 @@ public class Repository {
                     }
                 }
 
-                MergeCommit("Merged " + branchName + " into " + curBranchName +
-                        ".", bran.getId(), branchName);
+                mergeCommit("Merged " + branchName + " into " + curBranchName
+                        + ".", bran.getId(), branchName);
                 if (isConflicted) {
                     System.out.println("Encountered a merge conflict.");
                 }
@@ -1032,7 +1032,7 @@ public class Repository {
      * returns the content of the file tracked by the commit
      */
     private static String getContents(String fileName, Commit commit) {
-        String fileId = commit.NameToIdInMapping(fileName);
+        String fileId = commit.nameToIdInMapping(fileName);
         if (fileId != null) {
             //file exists
             String contents = readContentsAsString(join(BLOBS_DIR, fileId));
@@ -1051,8 +1051,8 @@ public class Repository {
             if (cur.getParent() != null) {
                 traverseDFS(getCommitOfId(cur.getParent()), path);
             }
-            if (cur.getSecond_parent() != null) {
-                traverseDFS(getCommitOfId(cur.getSecond_parent()), path);
+            if (cur.getSecondParent() != null) {
+                traverseDFS(getCommitOfId(cur.getSecondParent()), path);
             }
         }
     }
@@ -1070,8 +1070,8 @@ public class Repository {
             if (cur.getParent() != null) {
                 queue.offer(cur.getParent());
             }
-            if (cur.getSecond_parent() != null) {
-                queue.offer(cur.getSecond_parent());
+            if (cur.getSecondParent() != null) {
+                queue.offer(cur.getSecondParent());
             }
         }
         return null;
@@ -1089,11 +1089,11 @@ public class Repository {
         return readObject(join(COMMITS_DIR, spId), Commit.class);
     }
 
-    private static void OverwriteError(String fileName) {
+    private static void overwriteError(String fileName) {
         List<String> untrackedFNs = getUntrackedFileNames(); //file name not id
         if (untrackedFNs.contains(fileName)) {
-            System.out.println("There is an untracked file in the way; " +
-                    "delete it, or add and commit it first.");
+            System.out.println("There is an untracked file in the way; "
+                    + "delete it, or add and commit it first.");
             System.exit(0);
         }
     }

@@ -61,7 +61,7 @@ public class Main {
                 break;
             case "global-log":
                 validateNumArgs(args, 1);
-                Repository.global_log();
+                Repository.globalLog();
                 break;
             case "find":
                 validateNumArgs(args, 2);
@@ -79,17 +79,17 @@ public class Main {
                             System.out.println("Incorrect operands.");
                             System.exit(0);
                         }
-                        Repository.checkout_fileName(args[2]);
+                        Repository.checkoutFileName(args[2]);
                         break;
                     case 4:
                         if (!args[2].equals("--")) {
                             System.out.println("Incorrect operands.");
                             System.exit(0);
                         }
-                        Repository.checkout_idAndFileName(args[1], args[3]);
+                        Repository.checkoutIdAndFileName(args[1], args[3]);
                         break;
                     case 2:
-                        Repository.checkout_branchName(args[1]);
+                        Repository.checkoutBranchName(args[1]);
                         break;
                     default:
                         System.out.println("Incorrect operands.");
@@ -103,7 +103,7 @@ public class Main {
                 break;
             case "rm-branch":
                 validateNumArgs(args, 2);
-                Repository.rm_branch(args[1]);
+                Repository.rmBranch(args[1]);
                 break;
             case "reset":
                 validateNumArgs(args, 2);

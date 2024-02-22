@@ -43,19 +43,19 @@ public class Blob implements Serializable {
      * The files stored in the addition.
      * Id to name.
      */
-    private static final HashMap<String, String> addFiles = Main.serialized.getAddFiles();
+    private static final HashMap<String, String> ADDFILES = Main.serialized.getAddFiles();
 
     /**
      * The files stored in the removal.
      * Id to name.
      */
-    private static final HashMap<String, String> rmFiles = Main.serialized.getRmFiles();
+    private static final HashMap<String, String> RMFILES = Main.serialized.getRmFiles();
 
     public static HashMap<String, String> getAddFiles() {
-        return addFiles;
+        return ADDFILES;
     }
     public static HashMap<String, String> getRmFiles() {
-        return rmFiles;
+        return RMFILES;
     }
     public Blob(String fileName) {
         this.fileName = fileName;
@@ -85,15 +85,15 @@ public class Blob implements Serializable {
         if (!saveFile.exists()) {
             rmTarName(fileName);
             writeContents(saveFile, readContentsAsString(filePath));
-            addFiles.put(id, fileName);
+            ADDFILES.put(id, fileName);
         }
     }
 
     private static void rmTarName(String fileName) {
-        for (Map.Entry<String, String> entry : addFiles.entrySet()) {
+        for (Map.Entry<String, String> entry : ADDFILES.entrySet()) {
             if (entry.getKey().equals(fileName)) {
                 join(ADD_DIR, entry.getKey()).delete();
-                addFiles.remove(entry.getKey());
+                ADDFILES.remove(entry.getKey());
             }
         }
     }
@@ -105,7 +105,7 @@ public class Blob implements Serializable {
         File rmPath = join(RM_DIR, id);
         File filePath = join(BLOBS_DIR, id);
         copy(filePath, rmPath);
-        rmFiles.put(id, fileName);
+        RMFILES.put(id, fileName);
     }
 
     /**
@@ -122,7 +122,7 @@ public class Blob implements Serializable {
         if (existsInAdd(id)) {
             File addPath = join(ADD_DIR, id);
             addPath.delete();
-            addFiles.remove(id);
+            ADDFILES.remove(id);
         }
     }
 
@@ -131,8 +131,8 @@ public class Blob implements Serializable {
         return currentCommit.hasBlob(id);
     }
 
-    public static String NameToIdInAddition(String fileName) {
-        for (Map.Entry<String, String> entryTracked : addFiles.entrySet()) {
+    public static String nameToIdInAddition(String fileName) {
+        for (Map.Entry<String, String> entryTracked : ADDFILES.entrySet()) {
             if (entryTracked.getValue().equals(fileName)) {
                 return entryTracked.getKey();
             }
