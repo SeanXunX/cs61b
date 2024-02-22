@@ -990,6 +990,8 @@ public class Repository {
         }
     }
 
+    //todo : 1.BFS one of the heads. 2.BFS the other find the first
+    //Wrong!!!
     private static Commit getSplitPoint(String branchName) {
         Commit cur = Commit.getHeadCommit();
         String curId = cur.getId();
