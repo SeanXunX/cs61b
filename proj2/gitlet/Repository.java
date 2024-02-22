@@ -537,11 +537,11 @@ public class Repository {
         return null;
     }
 
-    private static void printConditionFileNames(List<String> Fs) {
-        if (Fs != null) {
-            String[] FsArr = Fs.toArray(new String[0]);
-            Arrays.sort(FsArr);
-            for (String name : FsArr) {
+    private static void printConditionFileNames(List<String> FS) {
+        if (FS != null) {
+            String[] fsArr = FS.toArray(new String[0]);
+            Arrays.sort(fsArr);
+            for (String name : fsArr) {
                 System.out.println(name);
             }
             System.out.println();
@@ -905,24 +905,26 @@ public class Repository {
      * and exit;
      * perform this check before doing anything else.
      */
-    public static void merge(String branchName) {
-        notInitializedError();
-
-        Commit splitPoint = getSplitPoint(branchName);
-        Commit cur = Commit.getHeadCommit();
-        Commit bran = Commit.getHeadCommitOfBranch(branchName);
+    public static void nullError(Commit bran) {
         if (bran == null) {
             System.out.println("A branch with that name does not exist.");
             System.exit(0);
         }
-
-        untrackedError(bran);
-
+    }
+    public static void uncommittedError() {
         if (Blob.getAddFiles().size() + Blob.getRmFiles().size() > 0) {
             System.out.println("You have uncommitted changes.");
             System.exit(0);
         }
-
+    }
+    public static void merge(String branchName) {
+        notInitializedError();
+        Commit splitPoint = getSplitPoint(branchName);
+        Commit cur = Commit.getHeadCommit();
+        Commit bran = Commit.getHeadCommitOfBranch(branchName);
+        nullError(bran);
+        untrackedError(bran);
+        uncommittedError();
         if (cur.getId().equals(bran.getId())) {
             System.out.println("Cannot merge a branch with itself.");
             System.exit(0);
@@ -939,7 +941,6 @@ public class Repository {
                 for (Map.Entry<String, String> entry : splitPoint.getIdToName().entrySet()) {
                     String fileName = entry.getValue();
                     String fileId = entry.getKey();
-
                     if (cur.hasBlob(fileId)) {
                         //Not modified in cur
                         if (bran.hasFile(fileName) && !bran.hasBlob(fileId)) {
@@ -952,13 +953,11 @@ public class Repository {
                         }
                     }
                 }
-
                 //Exists in the bran
                 for (Map.Entry<String, String> entry : bran.getIdToName().entrySet()) {
                     String fileName = entry.getValue();
                     String fileId = entry.getKey();
                     File cwdFile = join(CWD, fileName);
-
                     if (!splitPoint.hasFile(fileName)) {
                         //Not exists in the split point
                         if (!cur.hasFile(fileName)) {
@@ -967,7 +966,6 @@ public class Repository {
                             add(fileName);
                         }
                     }
-
                     //CONFLICTED
                     if (!splitPoint.hasFile(fileName)) {
                         //Absent in split point
@@ -981,8 +979,8 @@ public class Repository {
                         }
                     } else if (!splitPoint.hasBlob(fileId)) {
                         //Original in split point, different from bran
-                        if (cur.hasFile(fileName) && !cur.hasBlob(fileId) &&
-                                !cur.hasBlob(splitPoint.nameToIdInMapping(fileName))) {
+                        if (cur.hasFile(fileName) && !cur.hasBlob(fileId)
+                                && !cur.hasBlob(splitPoint.nameToIdInMapping(fileName))) {
                             //File exists in cur, but different with that in bran and split point
                             String branCon = getContents(fileName, bran);
                             String curCon = getContents(fileName, cur);
@@ -998,14 +996,12 @@ public class Repository {
                         }
                     }
                 }
-
                 for (Map.Entry<String, String> entry : cur.getIdToName().entrySet()) {
                     String fileName = entry.getValue();
                     String fileId = entry.getKey();
                     File cwdFile = join(CWD, fileName);
-
-                    if (!bran.hasFile(fileName) && splitPoint.hasFile(fileName) &&
-                            !splitPoint.hasBlob(fileId)) {
+                    if (!bran.hasFile(fileName) && splitPoint.hasFile(fileName)
+                            && !splitPoint.hasBlob(fileId)) {
                         //absent in bran, modified in cur, original in split point
                         String branCon = "";
                         String curCon = getContents(fileName, cur);
@@ -1014,7 +1010,6 @@ public class Repository {
                         isConflicted = true;
                     }
                 }
-
                 mergeCommit("Merged " + branchName + " into " + curBranchName
                         + ".", bran.getId(), branchName);
                 if (isConflicted) {
@@ -1043,7 +1038,7 @@ public class Repository {
     }
 
     /**
-     * DFS one of the heads. 2.BFS the other find the first
+     * DFS one of the heads. 2.bfsSearch the other find the first
      */
     private static void traverseDFS(Commit cur, HashSet<String> path) {
         if (cur != null) {
@@ -1057,7 +1052,7 @@ public class Repository {
         }
     }
 
-    private static String BFS(Commit cur, HashSet<String> path) {
+    private static String bfsSearch(Commit cur, HashSet<String> path) {
         Queue<String> queue = new LinkedList<>();
         queue.offer(cur.getId());
         String curId = null;
@@ -1085,7 +1080,7 @@ public class Repository {
             System.exit(0);
         }
         traverseDFS(bran, path);
-        String spId = BFS(cur, path);
+        String spId = bfsSearch(cur, path);
         return readObject(join(COMMITS_DIR, spId), Commit.class);
     }
 
