@@ -52,7 +52,7 @@ public class Commit implements Serializable {
      * The ids of this commit's parents. The first is the original parent.
      */
     private String parent;
-    private String second_parent;
+    private String secondParent;
 
     /**
      * The blobs that this commit tracks. Key is sha1. Value is the original file name.
@@ -73,7 +73,7 @@ public class Commit implements Serializable {
         message = "initial commit";
         date = new Date(0);
         parent = null;
-        second_parent = null;
+        secondParent = null;
         idToName = new HashMap<>();
         id = generateIdInit();
     }
@@ -86,7 +86,7 @@ public class Commit implements Serializable {
         this.message = message;
         date = new Date();
         parent = headCommit.id;
-        second_parent = null;
+        secondParent = null;
         idToName = new HashMap<>();
         idToName.putAll(headCommit.getIdToName());
         id = generateId();
@@ -94,12 +94,12 @@ public class Commit implements Serializable {
         rmFromMapping();
     }
 
-    public Commit(String message, String second_parentId) {
+    public Commit(String message, String secondParentId) {
         Commit headCommit = getHeadCommit();
         this.message = message;
         date = new Date();
         parent = headCommit.id;
-        second_parent = second_parentId;
+        secondParent = secondParentId;
         idToName = new HashMap<>();
         idToName.putAll(headCommit.getIdToName());
         id = generateId();
@@ -163,11 +163,11 @@ public class Commit implements Serializable {
      * Each commit is identified by its SHA-1 id,
      * which must include the file (blob) references of its files, parent reference,
      * log message, and commit time.
-     * Generates the id according to message, date, parent, second_parent, idToName
+     * Generates the id according to message, date, parent, secondParent, idToName
      */
     private String generateId() {
         return sha1(message, date.toString(), parent,
-                Objects.requireNonNullElse(second_parent, ""), idToName.toString());
+                Objects.requireNonNullElse(secondParent, ""), idToName.toString());
     }
 
     private String generateIdInit() {
@@ -240,7 +240,7 @@ public class Commit implements Serializable {
         return parent;
     }
     public String getSecond_parent() {
-        return second_parent;
+        return secondParent;
     }
     public HashMap<String, String> getIdToName() {
         return idToName;

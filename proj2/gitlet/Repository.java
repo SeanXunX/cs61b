@@ -111,8 +111,8 @@ public class Repository {
      */
     public static void init() throws IOException {
         if (GITLET_DIR.exists()) {
-            System.out.println("A Gitlet version-control system already exists " +
-                    "in the current directory.");
+            System.out.println("A Gitlet version-control system already exists "
+                    + "in the current directory.");
             System.exit(0);
         }
 
@@ -237,7 +237,7 @@ public class Repository {
     /**
      * Commit after merge
      */
-    private static void MergeCommit(String message, String second_parentId, String branName) {
+    private static void MergeCommit(String message, String secondParentId, String branName) {
         notInitializedError();
         //Failure cases
         if (message.isEmpty()) {
@@ -245,7 +245,7 @@ public class Repository {
             System.exit(0);
         }
 
-        Commit newCommit = new Commit(message, second_parentId);
+        Commit newCommit = new Commit(message, secondParentId);
         writeContents(HEAD, newCommit.getId());
         writeContents(join(HEADS_DIR, curBranchName), newCommit.getId());
         writeContents(join(HEADS_DIR, branName), newCommit.getId());
@@ -264,18 +264,18 @@ public class Repository {
      */
     public static void rm(String fileName) {
         notInitializedError();
-        String id_Add = Blob.NameToIdInAddition(fileName);
-        String id_Com = Commit.NameToIdInMappingCurCom(fileName);
+        String idAdd = Blob.NameToIdInAddition(fileName);
+        String idCom = Commit.NameToIdInMappingCurCom(fileName);
         File cwdFile = join(CWD, fileName);
-        if (id_Add == null && id_Com == null) {
+        if (idAdd == null && idCom == null) {
             System.out.println("No reason to remove the file.");
             System.exit(0);
         } else {
-            if (id_Add != null) {
-                Blob.removeFromAdd(id_Add);
+            if (idAdd != null) {
+                Blob.removeFromAdd(idAdd);
             }
-            if (id_Com != null) {
-                Blob.toRm(id_Com, fileName);
+            if (idCom != null) {
+                Blob.toRm(idCom, fileName);
                 if (cwdFile.exists()) {
                     cwdFile.delete();
                 }
