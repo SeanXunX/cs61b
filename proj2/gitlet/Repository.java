@@ -870,6 +870,8 @@ public class Repository {
             System.exit(0);
         }
 
+        UntrackedError(bran);
+
         if (Blob.getAddFiles().size() + Blob.getRmFiles().size() > 0) {
             System.out.println("You have uncommitted changes.");
             System.exit(0);
