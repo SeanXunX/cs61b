@@ -797,6 +797,7 @@ public class Repository {
         AddTarTrackedCWD(tarCommit);
         ClearStaging();
         writeContents(HEAD, tarCommit.getId());
+        writeContents(join(heads_DIR, curBranchName), tarCommit.getId());
     }
 
     /**
