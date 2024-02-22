@@ -19,9 +19,9 @@ public class Blob implements Serializable {
      */
     public static final File CWD = new File(System.getProperty("user.dir"));
     public static final File GITLET_DIR = join(CWD, ".gitlet");
-    public static final File add_DIR = join(GITLET_DIR, "stage", "addition");
-    public static final File rm_DIR = join(GITLET_DIR, "stage", "removal");
-    public static final File blobs_DIR = join(GITLET_DIR, "objects", "blobs");
+    public static final File ADD_DIR = join(GITLET_DIR, "stage", "addition");
+    public static final File RM_DIR = join(GITLET_DIR, "stage", "removal");
+    public static final File BLOBS_DIR = join(GITLET_DIR, "objects", "blobs");
 
 
     /**
@@ -81,7 +81,7 @@ public class Blob implements Serializable {
      * The contents is the file content.
      */
     public void toAdd() {
-        File saveFile = join(add_DIR, id);
+        File saveFile = join(ADD_DIR, id);
         if (!saveFile.exists()) {
             rmTarName(fileName);
             writeContents(saveFile, readContentsAsString(filePath));
@@ -92,7 +92,7 @@ public class Blob implements Serializable {
     private static void rmTarName(String fileName) {
         for (Map.Entry<String, String> entry : addFiles.entrySet()) {
             if (entry.getKey().equals(fileName)) {
-                join(add_DIR, entry.getKey()).delete();
+                join(ADD_DIR, entry.getKey()).delete();
                 addFiles.remove(entry.getKey());
             }
         }
@@ -102,8 +102,8 @@ public class Blob implements Serializable {
      * Adds this blob to the removal.
      */
     public static void toRm(String id, String fileName) {
-        File rmPath = join(rm_DIR, id);
-        File filePath = join(blobs_DIR, id);
+        File rmPath = join(RM_DIR, id);
+        File filePath = join(BLOBS_DIR, id);
         copy(filePath, rmPath);
         rmFiles.put(id, fileName);
     }
@@ -112,7 +112,7 @@ public class Blob implements Serializable {
      * returns if the blob has already existed in the addition
      */
     public static boolean existsInAdd(String id) {
-        return join(add_DIR, id).exists();
+        return join(ADD_DIR, id).exists();
     }
 
     /**
@@ -120,7 +120,7 @@ public class Blob implements Serializable {
      */
     public static void removeFromAdd(String id) {
         if (existsInAdd(id)) {
-            File addPath = join(add_DIR, id);
+            File addPath = join(ADD_DIR, id);
             addPath.delete();
             addFiles.remove(id);
         }

@@ -31,11 +31,11 @@ public class Commit implements Serializable {
     public static final File CWD = new File(System.getProperty("user.dir"));
     public static final File GITLET_DIR = join(CWD, ".gitlet");
     public static final File HEAD = join(GITLET_DIR, "HEAD");
-    public static final File commits_DIR = join(GITLET_DIR, "objects", "commits");
-    public static final File blobs_DIR = join(GITLET_DIR, "objects", "blobs");
-    public static final File add_DIR = join(GITLET_DIR, "stage", "addition");
-    public static final File rm_DIR = join(GITLET_DIR, "stage", "removal");
-    public static final File heads_DIR = join(GITLET_DIR, "refs", "heads");
+    public static final File COMMITS_DIR = join(GITLET_DIR, "objects", "commits");
+    public static final File BLOBS_DIR = join(GITLET_DIR, "objects", "blobs");
+    public static final File ADD_DIR = join(GITLET_DIR, "stage", "addition");
+    public static final File RM_DIR = join(GITLET_DIR, "stage", "removal");
+    public static final File HEADS_DIR = join(GITLET_DIR, "refs", "heads");
 
 
     /**
@@ -117,10 +117,11 @@ public class Commit implements Serializable {
         while (iterator.hasNext()) {
             Map.Entry<String, String> entry = iterator.next();
             // Removes the old version in the idToName mapping and updates.
-            idToName.entrySet().removeIf(entryTracked -> entryTracked.getValue().equals(entry.getValue()));
+            idToName.entrySet().removeIf(entryTracked ->
+                    entryTracked.getValue().equals(entry.getValue()));
             idToName.put(entry.getKey(), entry.getValue());
-            File src = join(add_DIR, entry.getKey());
-            File tar = join(blobs_DIR, entry.getKey());
+            File src = join(ADD_DIR, entry.getKey());
+            File tar = join(BLOBS_DIR, entry.getKey());
             move(src, tar);
             // Removes the processed entry from Blob.getAddFiles().
             iterator.remove();
@@ -153,18 +154,20 @@ public class Commit implements Serializable {
         while (iterator.hasNext()) {
             Map.Entry<String, String> entry = iterator.next();
             idToName.remove(entry.getKey());
-            join(rm_DIR, entry.getKey()).delete();
+            join(RM_DIR, entry.getKey()).delete();
             iterator.remove();
         }
     }
 
     /**
      * Each commit is identified by its SHA-1 id,
-     * which must include the file (blob) references of its files, parent reference, log message, and commit time.
+     * which must include the file (blob) references of its files, parent reference,
+     * log message, and commit time.
      * Generates the id according to message, date, parent, second_parent, idToName
      */
     private String generateId() {
-        return sha1(message, date.toString(), parent, Objects.requireNonNullElse(second_parent, ""), idToName.toString());
+        return sha1(message, date.toString(), parent,
+                Objects.requireNonNullElse(second_parent, ""), idToName.toString());
     }
 
     private String generateIdInit() {
@@ -182,7 +185,7 @@ public class Commit implements Serializable {
      * Saves this commit to the object.
      */
     public void saveCommit() {
-        writeObject(join(commits_DIR, id), this);
+        writeObject(join(COMMITS_DIR, id), this);
     }
 
     /**
@@ -208,7 +211,7 @@ public class Commit implements Serializable {
      * gets the commit to which HEAD points
      */
     public static Commit getHeadCommit() {
-        File headCommitPath = join(commits_DIR, readContentsAsString(HEAD));
+        File headCommitPath = join(COMMITS_DIR, readContentsAsString(HEAD));
         return readObject(headCommitPath, Commit.class);
     }
 
@@ -216,9 +219,9 @@ public class Commit implements Serializable {
      * Get the given branch's HEAD points
      */
     public static Commit getHeadCommitOfBranch(String branchName) {
-        File branHead = join(heads_DIR, branchName);
+        File branHead = join(HEADS_DIR, branchName);
         if (branHead.exists()) {
-            File headCommitPath = join(commits_DIR, readContentsAsString(branHead));
+            File headCommitPath = join(COMMITS_DIR, readContentsAsString(branHead));
             if (!headCommitPath.exists()) {
                 return null;
             }
@@ -244,7 +247,7 @@ public class Commit implements Serializable {
     }
     public Commit parentCommit() {
         if (parent != null) {
-            File parentFile = join(commits_DIR, parent);
+            File parentFile = join(COMMITS_DIR, parent);
             return readObject(parentFile, Commit.class);
         }
         return null;

@@ -56,35 +56,35 @@ public class Repository {
     /**
      * The objects folder contains commits and blobs.
      */
-    public static final File objects_DIR = join(GITLET_DIR, "objects");
-    public static final File commits_DIR = join(GITLET_DIR, "objects", "commits");
-    public static final File blobs_DIR = join(GITLET_DIR, "objects", "blobs");
+    public static final File OBJECTS_DIR = join(GITLET_DIR, "objects");
+    public static final File COMMITS_DIR = join(GITLET_DIR, "objects", "commits");
+    public static final File BLOBS_DIR = join(GITLET_DIR, "objects", "blobs");
 
     /**
      * The refs folder includes heads and remotes.
      */
-    public static final File refs_DIR = join(GITLET_DIR, "refs");
-    public static final File heads_DIR = join(GITLET_DIR, "refs", "heads");
-    public static final File remotes_DIR = join(GITLET_DIR, "refs", "remotes");
+    public static final File REFS_DIR = join(GITLET_DIR, "refs");
+    public static final File HEADS_DIR = join(GITLET_DIR, "refs", "heads");
+    public static final File REMOTES_DIR = join(GITLET_DIR, "refs", "remotes");
 
 
-    public static final File stage_DIR = join(GITLET_DIR, "stage");
+    public static final File STAGE_DIR = join(GITLET_DIR, "stage");
 
     /**
      * Records the id to name mapping of addition and removal.
      */
-    public static final File stageSerialized = join(GITLET_DIR, "Serialized");
+    public static final File STAGE_SERIALIZED = join(GITLET_DIR, "Serialized");
 
 
     /**
      * The addition directory is for adding stage.
      */
-    public static final File add_DIR = join(GITLET_DIR, "stage", "addition");
+    public static final File ADD_DIR = join(GITLET_DIR, "stage", "addition");
 
     /**
      * The removal directory is for removing stage.
      */
-    public static final File rm_DIR = join(GITLET_DIR, "stage", "removal");
+    public static final File RM_DIR = join(GITLET_DIR, "stage", "removal");
 
 
     /**
@@ -99,11 +99,14 @@ public class Repository {
      * Creates a new Gitlet version-control system in the current directory.
      * <p>
      * This system will automatically start with one commit:
-     * a commit that contains no files and has the commit message initial commit (just like that, with no punctuation).
+     * a commit that contains no files and has the commit message initial commit
+     * (just like that, with no punctuation).
      * <p>
-     * It will have a single branch: master, which initially points to this initial commit, and master will be the current branch.
+     * It will have a single branch: master, which initially points to this initial
+     * commit, and master will be the current branch.
      * <p>
-     * The timestamp for this initial commit will be 00:00:00 UTC, Thursday, 1 January 1970 in whatever format you choose
+     * The timestamp for this initial commit will be 00:00:00 UTC, Thursday, 1 January
+     * 1970 in whatever format you choose
      * for dates (this is called “The (Unix) Epoch”, represented internally by the time 0.)
      */
     public static void init() throws IOException {
@@ -116,25 +119,25 @@ public class Repository {
         //Create directories
         GITLET_DIR.mkdir();
 
-        objects_DIR.mkdir();
-        commits_DIR.mkdir();
-        blobs_DIR.mkdir();
+        OBJECTS_DIR.mkdir();
+        COMMITS_DIR.mkdir();
+        BLOBS_DIR.mkdir();
 
-        refs_DIR.mkdir();
-        heads_DIR.mkdir();
-        remotes_DIR.mkdir();
+        REFS_DIR.mkdir();
+        HEADS_DIR.mkdir();
+        REMOTES_DIR.mkdir();
 
-        stage_DIR.mkdir();
-        stageSerialized.createNewFile();
-        add_DIR.mkdir();
-        rm_DIR.mkdir();
+        STAGE_DIR.mkdir();
+        STAGE_SERIALIZED.createNewFile();
+        ADD_DIR.mkdir();
+        RM_DIR.mkdir();
 
         HEAD.createNewFile();
 
         //Create initial commit
         Commit newCommit = new Commit();
         //Create branch master
-        File masterPath = join(heads_DIR, "master");
+        File masterPath = join(HEADS_DIR, "master");
         curBranchName = "master";
         Main.serialized.setCurBranchName(curBranchName);
         writeContents(masterPath, newCommit.getId());
@@ -161,11 +164,14 @@ public class Repository {
     /**
      * Adds a copy of the file to the addition
      * <p>
-     * If the current working version of the file is identical to the version in the current commit,
-     * do not stage it to be added, and remove it from the staging area if it is already there (as can happen when a
+     * If the current working version of the file is identical to the version
+     * in the current commit,
+     * do not stage it to be added, and remove it from the staging area if it
+     * is already there (as can happen when a
      * file is changed, added, and then changed back to its original version).
      * <p>
-     * If the file does not exist, print the error message File does not exist. and exit without changing anything.
+     * If the file does not exist, print the error message File does not exist.
+     * and exit without changing anything.
      */
     public static void add(String fileName) {
         notInitializedError();
@@ -182,25 +188,33 @@ public class Repository {
     }
 
     /**
-     * By default, each commit’s snapshot of files will be exactly the same as its parent commit’s snapshot of files
+     * By default, each commit’s snapshot of files will be exactly the same
+     * as its parent commit’s snapshot of files
      * <p>
-     * A commit will only update the contents of files it is tracking that have been staged for addition at the time of commit,
-     * in which case the commit will now include the version of the file that was staged instead of the version it got from its parent.
+     * A commit will only update the contents of files it is tracking that have
+     * been staged for addition at the time of commit,
+     * in which case the commit will now include the version of the file that was
+     * staged instead of the version it got from its parent.
      * <p>
-     * A commit will save and start tracking any files that were staged for addition but weren’t tracked by its parent.
+     * A commit will save and start tracking any files that were staged for
+     * addition but weren’t tracked by its parent.
      * <p>
-     * Finally, files tracked in the current commit may be untracked in the new commit as a result being staged for removal by the rm command (below).
+     * Finally, files tracked in the current commit may be untracked in the
+     * new commit as a result being staged for removal by the rm command (below).
      * <p>
      * The staging area is cleared after a commit.
      * <p>
-     * The commit just made becomes the “current commit”, and the head pointer now points to it. The previous head commit is this commit’s parent commit.
+     * The commit just made becomes the “current commit”, and the head pointer
+     * now points to it. The previous head commit is this commit’s parent commit.
      * <p>
-     * Each commit is identified by its SHA-1 id, which must include the file (blob) references of its files, parent reference, log message, and commit time.
+     * Each commit is identified by its SHA-1 id, which must include the file
+     * (blob) references of its files, parent reference, log message, and commit time.
      * <p>
      * <p>
      * If no files have been staged, abort. Print the message No changes added to the commit.
      * <p>
-     * Every commit must have a non-blank message. If it doesn’t, print the error message Please enter a commit message.
+     * Every commit must have a non-blank message. If it doesn’t, print the error message
+     * Please enter a commit message.
      */
     public static void commit(String message) {
         notInitializedError();
@@ -216,7 +230,7 @@ public class Repository {
 
         Commit newCommit = new Commit(message);
         writeContents(HEAD, newCommit.getId());
-        writeContents(join(heads_DIR, curBranchName), newCommit.getId());
+        writeContents(join(HEADS_DIR, curBranchName), newCommit.getId());
         newCommit.saveCommit();
     }
 
@@ -233,8 +247,8 @@ public class Repository {
 
         Commit newCommit = new Commit(message, second_parentId);
         writeContents(HEAD, newCommit.getId());
-        writeContents(join(heads_DIR, curBranchName), newCommit.getId());
-        writeContents(join(heads_DIR, branName), newCommit.getId());
+        writeContents(join(HEADS_DIR, curBranchName), newCommit.getId());
+        writeContents(join(HEADS_DIR, branName), newCommit.getId());
         newCommit.saveCommit();
     }
 
@@ -245,7 +259,8 @@ public class Repository {
      * and remove the file from the working directory if the user has not already done so
      * (do not remove it unless it is tracked in the current commit).
      * <p>
-     * If the file is neither staged nor tracked by the head commit, print the error message No reason to remove the file.
+     * If the file is neither staged nor tracked by the head commit, print the error
+     * message No reason to remove the file.
      */
     public static void rm(String fileName) {
         notInitializedError();
@@ -270,16 +285,21 @@ public class Repository {
 
     /**
      * Starting at the current head commit,
-     * display information about each commit backwards along the commit tree until the initial commit,
-     * following the first parent commit links, ignoring any second parents found in merge commits.
+     * display information about each commit backwards along the commit tree
+     * until the initial commit,
+     * following the first parent commit links, ignoring any second parents found
+     * in merge commits.
      * For every node in this history, the information it should display is the commit id,
      * the time the commit was made, and the commit message.
      * There is a === before each commit and an empty line after it
-     * The timestamps displayed in the commits reflect the current timezone, not UTC; as a result,
+     * The timestamps displayed in the commits reflect the current timezone,
+     * not UTC; as a result,
      * the timestamp for the initial commit does not read Thursday, January 1st, 1970, 00:00:00,
      * but rather the equivalent Pacific Standard Time.
-     * By the way, you’ll find that the Java classes java.util.Date and java.util.Formatter are useful for getting and formatting times.
-     * For merge commits (those that have two parent commits), add a line just below the first, as in
+     * By the way, you’ll find that the Java classes java.util.Date and java.util.Formatter
+     * are useful for getting and formatting times.
+     * For merge commits (those that have two parent commits), add a line just below the
+     * first, as in
      * Example
      * ===
      * commit 3e8bf1d794ca2e9ef8a4007275acf3751c7170ff
@@ -288,8 +308,10 @@ public class Repository {
      * Merged development into master.
      * <p>
      * where the two hexadecimal numerals following “Merge:”
-     * consist of the first seven digits of the first and second parents’ commit ids, in that order.
-     * The first parent is the branch you were on when you did the merge; the second is that of the merged-in branch.
+     * consist of the first seven digits of the first and second parents’ commit ids,
+     * in that order.
+     * The first parent is the branch you were on when you did the merge; the second
+     * is that of the merged-in branch.
      */
     public static void log() {
         notInitializedError();
@@ -310,10 +332,10 @@ public class Repository {
     public static void global_log() {
         notInitializedError();
         Commit curCommit;
-        List<String> commitNames = plainFilenamesIn(commits_DIR);
+        List<String> commitNames = plainFilenamesIn(COMMITS_DIR);
         if (commitNames != null) {
             for (String name : commitNames) {
-                curCommit = readObject(join(commits_DIR, name), Commit.class);
+                curCommit = readObject(join(COMMITS_DIR, name), Commit.class);
                 printLog(curCommit);
             }
         }
@@ -325,7 +347,8 @@ public class Repository {
     private static void printLog(Commit curCommit) {
         System.out.print("===\n" + "commit " + curCommit.getId() + "\n");
         if (curCommit.getSecond_parent() != null) {
-            System.out.println("Merge: " + sevenAbb(curCommit.getParent()) + " " + sevenAbb(curCommit.getSecond_parent()));
+            System.out.println("Merge: " + sevenAbb(curCommit.getParent()) + " " +
+                    sevenAbb(curCommit.getSecond_parent()));
         }
         printDate(curCommit.getDate());
         System.out.println(curCommit.getMessage());
@@ -347,10 +370,10 @@ public class Repository {
         notInitializedError();
         boolean hasMessage = false;
         Commit curCommit;
-        List<String> commitNames = plainFilenamesIn(commits_DIR);
+        List<String> commitNames = plainFilenamesIn(COMMITS_DIR);
         if (commitNames != null) {
             for (String name : commitNames) {
-                curCommit = readObject(join(commits_DIR, name), Commit.class);
+                curCommit = readObject(join(COMMITS_DIR, name), Commit.class);
                 if (curCommit.getMessage().equals(commitMessage)) {
                     System.out.println(curCommit.getId());
                     hasMessage = true;
@@ -369,11 +392,12 @@ public class Repository {
     /**
      * Creates a new branch with the given name, and points it at the current head commit.
      * <p>
-     * If a branch with the given name already exists, print the error message A branch with that name already exists.
+     * If a branch with the given name already exists, print the error message A branch
+     * with that name already exists.
      */
     public static void branch(String branchName) {
         notInitializedError();
-        List<String> branches = plainFilenamesIn(heads_DIR);
+        List<String> branches = plainFilenamesIn(HEADS_DIR);
         if (branches != null) {
             for (String name : branches) {
                 if (name.equals(branchName)) {
@@ -382,13 +406,14 @@ public class Repository {
                 }
             }
         }
-        File newBranch = join(heads_DIR, branchName);
+        File newBranch = join(HEADS_DIR, branchName);
         Commit curCommit = Commit.getHeadCommit();
         writeContents(newBranch, curCommit.getId());
     }
 
     /**
-     * Displays what branches currently exist, and marks the current branch with a *. Also displays what files have been
+     * Displays what branches currently exist, and marks the current branch with a *.
+     * Also displays what files have been
      * staged for addition or removal.
      * <p>
      * Example:
@@ -411,18 +436,22 @@ public class Repository {
      * === Untracked Files ===
      * random.stuff
      * <p>
-     * There is an empty line between sections, and the entire status ends in an empty line as well.
-     * Entries should be listed in lexicographic order, using the Java string-comparison order (the asterisk doesn’t count).
+     * There is an empty line between sections, and the entire status ends in an empty
+     * line as well.
+     * Entries should be listed in lexicographic order, using the Java string-comparison
+     * order (the asterisk doesn’t count).
      * <p>
      * A file in the working directory is “modified but not staged” if it is
      * <p>
      * Tracked in the current commit, changed in the working directory, but not staged; or
      * Staged for addition, but with different contents than in the working directory; or
      * Staged for addition, but deleted in the working directory; or
-     * Not staged for removal, but tracked in the current commit and deleted from the working directory.
+     * Not staged for removal, but tracked in the current commit and deleted
+     * from the working directory.
      * <p>
      * The final category (“Untracked Files”) is for files present in the working directory
-     * but neither staged for addition nor tracked. This includes files that have been staged for removal,
+     * but neither staged for addition nor tracked. This includes files that have been staged
+     * for removal,
      * but then re-created without Gitlet’s knowledge.
      */
     public static void status() {
@@ -440,7 +469,8 @@ public class Repository {
         Commit curCommit = Commit.getHeadCommit();
 
         //Tracked in the current commit, changed in the working directory, but not staged.
-        //Not staged for removal, but tracked in the current commit and deleted from the working directory.
+        //Not staged for removal, but tracked in the current commit and deleted from
+        // the working directory.
         if (curCommit.getIdToName() != null) {
             for (Map.Entry<String, String> entry : curCommit.getIdToName().entrySet()) {
                 String fileName = entry.getValue();
@@ -520,7 +550,7 @@ public class Repository {
 
     private static void printBranches() {
         System.out.println("=== Branches ===");
-        List<String> branches = plainFilenamesIn(heads_DIR);
+        List<String> branches = plainFilenamesIn(HEADS_DIR);
         if (branches != null) {
             for (String name : branches) {
                 if (name.equals(curBranchName)) {
@@ -536,7 +566,8 @@ public class Repository {
     /**
      * 1.java gitlet.Main checkout -- [file name]
      * <p>
-     * Takes the version of the file as it exists in the head commit and puts it in the working directory,
+     * Takes the version of the file as it exists in the head commit and puts it
+     * in the working directory,
      * overwriting the version of the file that’s already there if there is one.
      * The new version of the file is not staged.
      * <p>
@@ -549,7 +580,7 @@ public class Repository {
             System.out.println("File does not exist in that commit.");
             System.exit(0);
         }
-        File src = join(blobs_DIR, id);
+        File src = join(BLOBS_DIR, id);
         File cwdPath = join(CWD, fileName);
         writeContents(cwdPath, readContentsAsString(src));
     }
@@ -557,7 +588,8 @@ public class Repository {
      * 2.java gitlet.Main checkout [commit id] -- [file name]
      * <p>
      * Takes the version of the file as it exists in the commit with the given id,
-     * and puts it in the working directory, overwriting the version of the file that’s already there if there is one.
+     * and puts it in the working directory, overwriting the version of the file
+     * that’s already there if there is one.
      * The new version of the file is not staged.
      * <p>
      */
@@ -570,14 +602,14 @@ public class Repository {
             System.exit(0);
         }
         OverwriteError(fileName);
-        File src = join(blobs_DIR, id);
+        File src = join(BLOBS_DIR, id);
         File cwdPath = join(CWD, fileName);
         writeContents(cwdPath, readContentsAsString(src));
     }
 
     private static String AbbToFull(String abbId) {
         char[] abbs = abbId.toCharArray();
-        List<String> commitIds = plainFilenamesIn(commits_DIR);
+        List<String> commitIds = plainFilenamesIn(COMMITS_DIR);
         for (String fullId : commitIds) {
             boolean flag = true;
             char[] temps = fullId.toCharArray();
@@ -603,7 +635,7 @@ public class Repository {
             System.out.println("No commit with that id exists.");
             System.exit(0);
         }
-        File tarCommitPath = join(commits_DIR, commitId);
+        File tarCommitPath = join(COMMITS_DIR, commitId);
         if (!tarCommitPath.exists()) {
             System.out.println("No commit with that id exists.");
             System.exit(0);
@@ -622,24 +654,30 @@ public class Repository {
      * <p>
      * If no branch with that name exists, print No such branch exists.
      * If that branch is the current branch, print No need to checkout the current branch.
-     * If a working file is untracked in the current branch and would be overwritten by the checkout,
-     * print There is an untracked file in the way; delete it, or add and commit it first. and exit;
+     * If a working file is untracked in the current branch and would be overwritten
+     * by the checkout,
+     * print There is an untracked file in the way; delete it, or add and
+     * commit it first. and exit;
      * perform this check before doing anything else. Do not change the CWD.
      */
 
     /**
      * 3.java gitlet.Main checkout [branch name]
      * <p>
-     * Takes all files in the commit at the head of the given branch, and puts them in the working directory,
-     * overwriting the versions of the files that are already there if they exist. Also, at the end of this command,
+     * Takes all files in the commit at the head of the given branch,
+     * and puts them in the working directory,
+     * overwriting the versions of the files that are already there if they exist.
+     * Also, at the end of this command,
      * the given branch will now be considered the current branch (HEAD).
-     * Any files that are tracked in the current branch but are not present in the checked-out branch are deleted.
-     * The staging area is cleared, unless the checked-out branch is the current branch (see Failure cases below).
+     * Any files that are tracked in the current branch but are not present
+     * in the checked-out branch are deleted.
+     * The staging area is cleared, unless the checked-out branch is the current branch
+     * (see Failure cases below).
      * <p>
      */
     public static void checkout_branchName(String branchName) {
         notInitializedError();
-        List<String> branchNames = plainFilenamesIn(heads_DIR);
+        List<String> branchNames = plainFilenamesIn(HEADS_DIR);
         if (branchName.equals(curBranchName)) {
             System.out.println("No need to checkout the current branch.");
             System.exit(0);
@@ -669,7 +707,7 @@ public class Repository {
     private static void AddTarTrackedCWD(Commit tarCommit) {
         for (Map.Entry<String, String> entry : tarCommit.getIdToName().entrySet()) {
             File cwdPathCur = join(CWD, entry.getValue());
-            writeContentFromFile(join(blobs_DIR, entry.getKey()), cwdPathCur);
+            writeContentFromFile(join(BLOBS_DIR, entry.getKey()), cwdPathCur);
         }
     }
 
@@ -685,14 +723,17 @@ public class Repository {
     }
 
     /**
-     * If a working file is untracked in the current branch and would be overwritten by the checkout,
-     * print There is an untracked file in the way; delete it, or add and commit it first. and exit;
+     * If a working file is untracked in the current branch and would be overwritten
+     * by the checkout,
+     * print There is an untracked file in the way; delete it, or add and commit it first.
+     * and exit;
      */
     private static void UntrackedError(Commit tarCommit) {
         List<String> untrackedFNs = getUntrackedFileNames(); //file name not id
         for (String name : tarCommit.getIdToName().values()) {
             if (untrackedFNs.contains(name)) {
-                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                System.out.println("There is an untracked file in the way; delete it, " +
+                        "or add and commit it first.");
                 System.exit(0);
             }
         }
@@ -706,9 +747,9 @@ public class Repository {
 
     private static void ClearStaging() {
         //Clear the staging area.
-        clearStagingArea(add_DIR);
+        clearStagingArea(ADD_DIR);
         Blob.getAddFiles().clear();
-        clearStagingArea(rm_DIR);
+        clearStagingArea(RM_DIR);
         Blob.getRmFiles().clear();
     }
 
@@ -758,7 +799,7 @@ public class Repository {
      */
     public static void rm_branch(String tarBranchName) {
         notInitializedError();
-        File tarBranch = join(heads_DIR, tarBranchName);
+        File tarBranch = join(HEADS_DIR, tarBranchName);
         if (!tarBranch.exists()) {
             System.out.println("A branch with that name does not exist.");
             System.exit(0);
@@ -797,23 +838,26 @@ public class Repository {
         AddTarTrackedCWD(tarCommit);
         ClearStaging();
         writeContents(HEAD, tarCommit.getId());
-        writeContents(join(heads_DIR, curBranchName), tarCommit.getId());
+        writeContents(join(HEADS_DIR, curBranchName), tarCommit.getId());
     }
 
     /**
      * Merges files from the given branch into the current branch.
      * <p>
      * If the split point is the same commit as the given branch, then we do nothing;
-     * the merge is complete, and the operation ends with the message Given branch is an ancestor of the current branch.
+     * the merge is complete, and the operation ends with the message Given branch is
+     * an ancestor of the current branch.
      * <p>
-     * If the split point is the current branch, then the effect is to check out the given branch,
+     * If the split point is the current branch, then the effect is to check out the
+     * given branch,
      * and the operation ends after printing the message Current branch fast-forwarded.
      * <p>
      * Otherwise:
      * <p>
      * 1. Any files that have been modified in the given branch since the split point,
      * but not modified in the current branch since the split point should be changed to
-     * their versions in the given branch (checked out from the commit at the front of the given branch).
+     * their versions in the given branch (checked out from the commit at the front of
+     * the given branch).
      * These files should then all be automatically staged.
      * To clarify, if a file is “modified in the given branch since the split point”
      * this means the version of the file as it exists in the commit at the front of
@@ -857,7 +901,8 @@ public class Repository {
      * just let the normal commit error message for this go through.
      * <p>
      * If an untracked file in the current commit would be overwritten or deleted by the merge,
-     * print There is an untracked file in the way; delete it, or add and commit it first. and exit;
+     * print There is an untracked file in the way; delete it, or add and commit it first.
+     * and exit;
      * perform this check before doing anything else.
      */
     public static void merge(String branchName) {
@@ -936,7 +981,8 @@ public class Repository {
                         }
                     } else if (!splitPoint.hasBlob(fileId)) {
                         //Original in split point, different from bran
-                        if (cur.hasFile(fileName) && !cur.hasBlob(fileId) && !cur.hasBlob(splitPoint.NameToIdInMapping(fileName))) {
+                        if (cur.hasFile(fileName) && !cur.hasBlob(fileId) &&
+                                !cur.hasBlob(splitPoint.NameToIdInMapping(fileName))) {
                             //File exists in cur, but different with that in bran and split point
                             String branCon = getContents(fileName, bran);
                             String curCon = getContents(fileName, cur);
@@ -958,7 +1004,8 @@ public class Repository {
                     String fileId = entry.getKey();
                     File cwdFile = join(CWD, fileName);
 
-                    if (!bran.hasFile(fileName) && splitPoint.hasFile(fileName) && !splitPoint.hasBlob(fileId)) {
+                    if (!bran.hasFile(fileName) && splitPoint.hasFile(fileName) &&
+                            !splitPoint.hasBlob(fileId)) {
                         //absent in bran, modified in cur, original in split point
                         String branCon = "";
                         String curCon = getContents(fileName, cur);
@@ -968,7 +1015,8 @@ public class Repository {
                     }
                 }
 
-                MergeCommit("Merged " + branchName + " into " + curBranchName + ".", bran.getId(), branchName);
+                MergeCommit("Merged " + branchName + " into " + curBranchName +
+                        ".", bran.getId(), branchName);
                 if (isConflicted) {
                     System.out.println("Encountered a merge conflict.");
                 }
@@ -987,7 +1035,7 @@ public class Repository {
         String fileId = commit.NameToIdInMapping(fileName);
         if (fileId != null) {
             //file exists
-            String contents = readContentsAsString(join(blobs_DIR, fileId));
+            String contents = readContentsAsString(join(BLOBS_DIR, fileId));
             return contents;
         } else {
             return null;
@@ -1038,7 +1086,7 @@ public class Repository {
         }
         traverseDFS(bran, path);
         String spId = BFS(cur, path);
-        return readObject(join(commits_DIR, spId), Commit.class);
+        return readObject(join(COMMITS_DIR, spId), Commit.class);
     }
 
     private static void OverwriteError(String fileName) {
@@ -1051,7 +1099,7 @@ public class Repository {
     }
 
     private static Commit getCommitOfId(String id) {
-        File file = join(commits_DIR, id);
+        File file = join(COMMITS_DIR, id);
         return readObject(file, Commit.class);
     }
 }
