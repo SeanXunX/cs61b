@@ -993,23 +993,50 @@ public class Repository {
     }
 
     //todo : 1.BFS one of the heads. 2.BFS the other find the first
-    //Wrong!!!
+    private static void traverseDFS(Commit cur, HashSet<String> path) {
+        if (cur != null) {
+            if (cur.getParent() != null) {
+                path.add(cur.getParent());
+                traverseDFS(getCommitOfId(cur.getParent()), path);
+            }
+            if (cur.getSecond_parent() != null) {
+                path.add(cur.getSecond_parent());
+                traverseDFS(getCommitOfId(cur.getSecond_parent()), path);
+            }
+        }
+    }
+
+    private static String BFS(Commit cur, HashSet<String> path) {
+        Queue<String> queue = new LinkedList<>();
+        queue.offer(cur.getId());
+        String curId = null;
+        while (!queue.isEmpty()) {
+            curId = queue.poll();
+            if (path.contains(curId)) {
+                return curId;
+            }
+            cur = getCommitOfId(curId);
+            if (cur.getParent() != null) {
+                queue.offer(cur.getParent());
+            }
+            if (cur.getSecond_parent() != null) {
+                queue.offer(cur.getSecond_parent());
+            }
+        }
+        return null;
+    }
     private static Commit getSplitPoint(String branchName) {
+        HashSet<String> path = new HashSet<>();
+
         Commit cur = Commit.getHeadCommit();
-        String curId = cur.getId();
         Commit bran = Commit.getHeadCommitOfBranch(branchName);
         if (bran == null) {
             System.out.println("A branch with that name does not exist.");
             System.exit(0);
         }
-        String branId = bran.getId();
-        while (!branId.equals(curId)) {
-            cur = (cur.parentCommit() == null) ? Commit.getHeadCommitOfBranch(branchName) : cur.parentCommit();
-            bran = (bran.parentCommit() == null) ? Commit.getHeadCommit() : bran.parentCommit();
-            curId = cur.getId();
-            branId = bran.getId();
-        }
-        return readObject(join(commits_DIR, curId), Commit.class);
+        traverseDFS(bran, path);
+        String spId = BFS(cur, path);
+        return readObject(join(commits_DIR, spId), Commit.class);
     }
 
     private static void OverwriteError(String fileName) {
@@ -1019,5 +1046,10 @@ public class Repository {
                     "delete it, or add and commit it first.");
             System.exit(0);
         }
+    }
+
+    private static Commit getCommitOfId(String id) {
+        File file = join(commits_DIR, id);
+        return readObject(file, Commit.class);
     }
 }
